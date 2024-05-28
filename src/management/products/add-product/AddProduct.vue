@@ -58,7 +58,6 @@ const uploadImageStore = useUploadImageStore()
 const uploadMessages = computed(() => uploadImageStore.uploadMessages)
 const uploading = computed(() => uploadImageStore.uploading)
 const containerRef = ref(null)
-const imageInput = ref(false)
 const loading = ref(false)
 const messages = ref([])
 const title = ref('')
@@ -74,7 +73,6 @@ const color = ref('')
 const colorName = ref('')
 const showColors = ref(false)
 const image = ref(null)
-const imageUrl = ref('')
 const baseColors = reactive([
   { hex: '#FFFFFF', name: 'White' },
   { hex: '#000000', name: 'Black' },

@@ -12,7 +12,7 @@
     <button
       @click="handleInputClick"
       :disabled="props.loading || props.uploading"
-      class="w-full px-4 py-2.5 rounded-full bg-[#F18868] text-white sm:text-md outline-0 flex items-center justify-center"
+      class="w-full px-4 py-2.5 bg-blue-600 text-white sm:text-md outline-0 flex items-center justify-center"
     >
       <span> {{ image != null ? 'Select other image' : 'Upload an image' }}</span>
       <unicon name="camera-plus" height="16" fill="white"></unicon>

@@ -16,7 +16,7 @@
                 required
                 placeholder="Email"
                 type="email"
-                class="w-full rounded-full text-sm px-8 py-2.5 border border-gray-400 outline-0 focus:border-[#0B877F]"
+                class="w-full text-sm px-8 py-2.5 border border-gray-400 outline-0 focus:border-blue-600"
                 id="email"
               />
             </div>
@@ -32,7 +32,7 @@
                 required
                 placeholder="Password"
                 type="password"
-                class="w-full rounded-full text-sm px-8 py-2.5 border border-gray-400 outline-0 focus:border-[#0B877F]"
+                class="w-full text-sm px-8 py-2.5 border border-gray-400 outline-0 focus:border-blue-600"
                 id="password"
               />
             </div>
@@ -40,7 +40,7 @@
           <button
             type="submit"
             :disabled="loginLoading"
-            class="flex items-center justify-center text-sm space-x-1 rounded-full w-full bg-[#0B877F] text-white px-5 py-2.5"
+            class="flex items-center justify-center text-sm space-x-1 w-full bg-[#0B877F] text-white px-5 py-2.5"
           >
             <span>Login</span>
             <unicon

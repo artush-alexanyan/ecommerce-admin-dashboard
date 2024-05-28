@@ -2,6 +2,21 @@
   font-family: 'Poppins';
   src: url('../fonts/poppins-regular.ttf') format('truetype');
 }
+@font-face {
+  font-family: 'Iron';
+  src: url('../fonts/ironsides.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Lato';
+  src: url('../fonts/lato.ttf') format('truetype');
+}
 body {
   font-family: 'Poppins', sans-serif;
+}
+
+.font-iron {
+  font-family: 'Iron', sans-serif;
+}
+.font-lato {
+  font-family: 'Lato', sans-serif;
 }

@@ -20,14 +20,14 @@
               required
               placeholder="Search"
               type="text"
-              class="w-full rounded-full text-sm px-8 py-2 border border-gray-200 outline-0 focus:border-[#0B877F]"
+              class="w-full text-sm px-8 py-2 border border-gray-200 outline-0 focus:border-blue-600"
               id="password"
             />
           </div>
         </div>
         <div class="messages_wrapper relative">
           <button>
-            <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-600"></span>
+            <span class="absolute top-0 right-0 rounded-full h-2 w-2 bg-red-600"></span>
             <unicon name="envelope" fill="black" height="20"></unicon>
           </button>
         </div>

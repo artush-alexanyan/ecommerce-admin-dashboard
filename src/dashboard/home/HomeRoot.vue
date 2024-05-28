@@ -12,11 +12,11 @@
         <input
           type="text"
           placeholder="Ask question..."
-          class="rounded-full w-full border border-gray-300 px-5 py-3 outline-0 focus:border-2 focus:border-[#0B877F]"
+          class="w-full border border-gray-300 px-5 py-3 outline-0 focus:border-2 focus:border-blue-600"
         />
         <button
           @click="sendAssistanceMessage"
-          class="px-4 py-2.5 rounded-full bg-[#0B877F] text-white sm:text-md outline-0 flex items-center justify-center ml-2.5"
+          class="px-4 py-2.5 bg-[#0B877F] text-white sm:text-md outline-0 flex items-center justify-center ml-2.5"
         >
           <unicon
             v-if="sending"

@@ -3,7 +3,7 @@
     <div>
       <label class="block mb-2 font-medium text-gray-900 dark:text-white">Product color</label>
       <div
-        class="relative w-full px-4 py-0.5 rounded-full bg-[#F18868] text-white sm:text-md outline-0 flex items-center justify-center"
+        class="relative w-full px-4 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white sm:text-md outline-0 flex items-center justify-center"
         :class="props.showColors ? 'border-[#0B877F]' : 'border-gray-300'"
         ref="container"
         id="container"

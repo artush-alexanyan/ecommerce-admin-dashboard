@@ -10,7 +10,10 @@
         >
           <p>Are you sure you want to delete this item?</p>
           <div class="flex items-center justify-center space-x-5">
-            <button class="bg-blue-600 text-white w-full px-5 py-2.5 rounded" @click="cancelDelete">
+            <button
+              class="bg-blue-600 text-white w-full px-5 py-2.5 rounded"
+              @click="emit('cancel-delete')"
+            >
               Cancel
             </button>
             <button
@@ -35,9 +38,9 @@ const props = defineProps({
 
 const emit = defineEmits(['cancel-delete', 'confirm-delete'])
 
-const cancelDelete = () => {
-  emit('cancel-delete')
-}
+// const cancelDelete = () => {
+//   emit('cancel-delete')
+// }
 const confirmDelete = () => {
   emit('confirm-delete')
 }
