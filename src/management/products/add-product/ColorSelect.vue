@@ -23,7 +23,7 @@
         >
           <div>
             <div
-              @click="selectColor(colorOption)"
+              @click.prevent="selectColor(colorOption)"
               class="flex items-center hover:cursor-pointer py-1 space-x-2"
               v-for="colorOption in props.baseColors"
               :key="colorOption.hex"

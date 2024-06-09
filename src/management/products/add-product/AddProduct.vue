@@ -35,10 +35,21 @@
               :loading="loading"
               :uploading="uploading"
               @handle-file-selection="handleFileSelection"
+              @upload-image="uploadNewImage"
             />
           </div>
           <SubmitButton :loading="loading" :uploading="uploading" :btnText="btnText" />
         </form>
+        <div class="uploaded-images my-10">
+          <p class="font-semibold">Uploaded Images</p>
+          <div class="images">
+            <ul class="flex items-center space-x-2">
+              <li v-for="(image, index) in images" :key="index">
+                <img class="h-12 rounded" :src="image" alt="uploaded-image" />
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -73,6 +84,8 @@ const color = ref('')
 const colorName = ref('')
 const showColors = ref(false)
 const image = ref(null)
+const images = ref([])
+const colors = ref([])
 const baseColors = reactive([
   { hex: '#FFFFFF', name: 'White' },
   { hex: '#000000', name: 'Black' },
@@ -128,16 +141,8 @@ const handleFileSelection = (event) => {
     reader.readAsDataURL(image.value)
   }
 }
-
-const createProduct = async () => {
-  const folderName = 'products'
-  const createdAt = new Date()
-  const numberHeight = Number(height.value)
-  const numberWidth = Number(width.value)
-  const newAvailableQt = Number(availableQt.value)
-  const imageUrl = await uploadImageStore.uploadImage(image.value, color.value, folderName)
-  loading.value = true
-  if (color.value === '') {
+const uploadNewImage = async () => {
+  if (!image.value) {
     messages.value.push({
       message: 'Please select image',
       type: 'Warning'
@@ -146,6 +151,35 @@ const createProduct = async () => {
     resetMessages()
     return
   }
+  const folderName = 'products'
+  const imageUrl = await uploadImageStore.uploadImage(image.value, folderName)
+  images.value.push(imageUrl)
+}
+const createProduct = async () => {
+  const createdAt = new Date()
+  const numberHeight = Number(height.value)
+  const numberWidth = Number(width.value)
+  const newAvailableQt = Number(availableQt.value)
+
+  if (color.value === '') {
+    messages.value.push({
+      message: 'Please select color',
+      type: 'Warning'
+    })
+    loading.value = false
+    resetMessages()
+    return
+  }
+  if (!image.value) {
+    messages.value.push({
+      message: 'Please select image',
+      type: 'Warning'
+    })
+    loading.value = false
+    resetMessages()
+    return
+  }
+  loading.value = true
   try {
     const response = await BASE_URL.post('products/add', {
       createdAt,
@@ -156,11 +190,13 @@ const createProduct = async () => {
       color: color.value,
       colorName: colorName.value,
       material: material.value,
-      image: imageUrl,
+      image: images.value[0],
       height: numberHeight,
       width: numberWidth,
       description: description.value,
-      availableQt: newAvailableQt
+      availableQt: newAvailableQt,
+      images: images.value,
+      colors: colors.value
     })
 
     if (response && response.status === 201) {
@@ -173,7 +209,7 @@ const createProduct = async () => {
     }
   } catch (error) {
     loading.value = false
-    console.error('Unexpected error:', error.response.data.message)
+    console.error('Unexpected error:', error.message)
     messages.value.push({
       message: error.response ? error.response.data.message : error.message,
       type: 'Error'

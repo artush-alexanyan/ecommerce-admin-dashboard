@@ -9,14 +9,24 @@
       placeholder="Image"
       ref="imageInput"
     />
-    <button
-      @click="handleInputClick"
-      :disabled="props.loading || props.uploading"
-      class="w-full px-4 py-2.5 bg-blue-600 text-white sm:text-md outline-0 flex items-center justify-center"
-    >
-      <span> {{ image != null ? 'Select other image' : 'Upload an image' }}</span>
-      <unicon name="camera-plus" height="16" fill="white"></unicon>
-    </button>
+    <div class="flex items-center space-x-2 5">
+      <button
+        @click.prevent="handleInputClick"
+        :disabled="props.loading || props.uploading"
+        class="w-full px-4 py-2.5 text-xs bg-blue-600 text-white sm:text-md outline-0 flex items-center justify-center"
+      >
+        <span> {{ image != null ? 'Select other image' : 'Upload an image' }}</span>
+        <unicon name="camera-plus" height="16" fill="white"></unicon>
+      </button>
+      <button
+        :disabled="uploading"
+        v-if="image"
+        class="text-xs bg-green-600 text-white p-2.5"
+        @click.prevent="uploadNewImage"
+      >
+        {{ uploading ? 'Wait..' : 'Save' }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -30,9 +40,13 @@ const props = defineProps({
   uploading: Boolean,
   image: Object
 })
-const emit = defineEmits(['handle-file-selection', 'select-color'])
+const emit = defineEmits(['handle-file-selection', 'upload-image'])
 
 const handleInputClick = () => {
   imageInput.value.click()
+}
+
+const uploadNewImage = () => {
+  emit('upload-image')
 }
 </script>

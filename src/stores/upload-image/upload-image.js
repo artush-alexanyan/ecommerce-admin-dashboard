@@ -11,18 +11,10 @@ export const useUploadImageStore = defineStore('UploadImageStore', {
         resetMessages() {
             setTimeout(() => { this.uploadMessages = [] }, 2500)
         },
-        async uploadImage(image, color, folderName) {
+        async uploadImage(image, folderName) {
             if (!image) {
                 this.uploadMessages.push({
                     message: 'Please select image',
-                    type: 'Warning'
-                })
-                this.resetMessages()
-                return
-            }
-            if (color === '') {
-                this.uploadMessages.push({
-                    message: 'Please select color',
                     type: 'Warning'
                 })
                 this.resetMessages()
