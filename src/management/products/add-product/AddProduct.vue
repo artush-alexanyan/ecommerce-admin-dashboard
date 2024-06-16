@@ -38,7 +38,7 @@
               @upload-image="uploadNewImage"
             />
           </div>
-          <SubmitButton :loading="loading" :uploading="uploading" :btnText="btnText" />
+          <SubmitButton :loading="loading" :uploading="loadingImage" :btnText="btnText" />
         </form>
         <div class="uploaded-images my-10">
           <p class="font-semibold">Uploaded Images</p>
@@ -64,12 +64,14 @@ import ColorSelect from './ColorSelect.vue'
 import SubmitButton from './SubmitButton.vue'
 import SelectImage from './SelectImage.vue'
 import BaseInput from '@/base/BaseInput.vue'
+import { loadModel, classifyImage } from '@/utils/tensorflowImageClassifier'
 
 const uploadImageStore = useUploadImageStore()
 const uploadMessages = computed(() => uploadImageStore.uploadMessages)
 const uploading = computed(() => uploadImageStore.uploading)
 const containerRef = ref(null)
 const loading = ref(false)
+const loadingImage = ref(false)
 const messages = ref([])
 const title = ref('')
 const price = ref('')
@@ -107,6 +109,31 @@ const baseColors = reactive([
   { hex: '#FF69B4', name: 'HotPink' }
 ])
 
+const processImage = async (imageUrl) => {
+  loadingImage.value = true
+  const image = new Image()
+  image.crossOrigin = 'Anonymous' // Allow cross-origin requests
+  image.src = imageUrl
+
+  return new Promise(async (resolve, reject) => {
+    image.onload = async () => {
+      try {
+        await loadModel()
+        const classificationResults = await classifyImage(image)
+        resolve(classificationResults)
+        loadingImage.value = false
+      } catch (error) {
+        loadingImage.value = false
+        reject(error)
+      }
+    }
+
+    image.onerror = (error) => {
+      reject(error)
+    }
+  })
+}
+
 const toggleColors = () => {
   showColors.value = !showColors.value
 }
@@ -118,8 +145,8 @@ const selectColor = (colorOption) => {
 }
 
 const btnText = () => {
-  if (uploading.value === true) {
-    return 'Uploading image...'
+  if (loadingImage.value === true) {
+    return 'Getting classifications...'
   } else if (loading.value === true) {
     return 'Creating product...'
   } else {
@@ -179,6 +206,8 @@ const createProduct = async () => {
     resetMessages()
     return
   }
+  const classificationResults = await processImage(images.value[0])
+  console.log('classificationResults', classificationResults)
   loading.value = true
   try {
     const response = await BASE_URL.post('products/add', {
@@ -196,7 +225,8 @@ const createProduct = async () => {
       description: description.value,
       availableQt: newAvailableQt,
       images: images.value,
-      colors: colors.value
+      colors: colors.value,
+      classificationResults
     })
 
     if (response && response.status === 201) {
@@ -207,6 +237,9 @@ const createProduct = async () => {
       })
       resetMessages()
     }
+
+    image.value = null
+    images.value = []
   } catch (error) {
     loading.value = false
     console.error('Unexpected error:', error.message)
