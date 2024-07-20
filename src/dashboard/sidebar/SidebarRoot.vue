@@ -3,10 +3,7 @@
     <div class="sidebar fixed top-0 left-0 w-56 bg-white">
       <aside class="relative h-screen pl-6">
         <div class="logo_wrapper mt-5 mb-10 border-b pb-5">
-          <h2 class="text-4xl font-iron">
-            <span class="font-semibold">Art</span>
-            <span> Store</span>
-          </h2>
+          <img src="@/assets/logo.png" class="h-10" alt="logo" />
         </div>
         <div class="sidebar-content">
           <ul>
@@ -14,7 +11,7 @@
               @click="changeTab(tab)"
               class="py-4 px-3.5 my-5 cursor-pointer"
               :class="{
-                'bg-black text-white': generalCurrentTab === tab
+                'bg-primary text-white': generalCurrentTab === tab
               }"
               v-for="(list, tab) in generalList"
               :key="list.id"
@@ -86,7 +83,8 @@ const generalList = ref([
   { id: 1, icon: 'layer-group', path: '/products', title: 'Products' },
   { id: 2, icon: 'shopping-cart', path: '/', title: 'Orders' },
   { id: 3, icon: 'user', path: '/', title: 'Customers' },
-  { id: 4, icon: 'setting', path: '/', title: 'Settings' }
+  { id: 4, icon: 'setting', path: '/', title: 'Settings' },
+  { id: 5, icon: 'list-ul', path: '/categories', title: 'Categories' }
 ])
 
 const generalCurrentTab = ref(0)
