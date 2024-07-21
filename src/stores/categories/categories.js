@@ -13,7 +13,8 @@ export const useCategoryStore = defineStore('CategoryStore', {
     showSubcategories: false,
     s_subCategorySaving: false,
     currentSubSubCategories: [],
-    subSubCategoriesFetching: false
+    subSubCategoriesFetching: false,
+    allCategories: []
   }),
 
   actions: {
@@ -115,6 +116,16 @@ export const useCategoryStore = defineStore('CategoryStore', {
         this.subSubCategoriesFetching = false
         alert(error.response ? error.response.data.message : error.message)
         console.error(error.response ? error.response.data.message : error.message)
+      }
+    },
+    async fetchCategories() {
+      try {
+        const response = await BASE_URL.get('/categoriesWithNestedSubcategories')
+        const data = response.data
+        console.log('data', data)
+        this.allCategories = data.categories
+      } catch (error) {
+        console.error(error)
       }
     },
     openCategoryPopup() {

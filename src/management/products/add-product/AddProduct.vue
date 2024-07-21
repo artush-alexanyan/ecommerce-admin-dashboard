@@ -13,10 +13,80 @@
               :type="'text'"
               v-model="description"
             />
-            <BaseInput v-bind="$attrs" :label="'Category'" :type="'text'" v-model="category" />
-            <BaseInput v-bind="$attrs" :label="'Category'" :type="'text'" v-model="category" />
-            <BaseInput v-bind="$attrs" :label="'Subategory'" :type="'text'" v-model="subcategory" />
-            <BaseInput v-bind="$attrs" :label="'Material'" :type="'text'" v-model="material" />
+            <div class="select flex-col flex">
+              <label> Select category </label>
+              <select
+                v-model="selectedCategory"
+                class="block w-full px-4 py-2.5 text-gray-900 border border-gray-300 bg-gray-50 sm:text-md focus:border-blue-600 outline-0"
+                name="category"
+                id="category"
+              >
+                <option
+                  class="flex items-center space-x-2"
+                  :value="category"
+                  v-for="(category, index) in categories"
+                  :key="index"
+                >
+                  <img :src="category.icon" alt="icon" class="h-4" />
+                  <span> {{ category.title_ru }}</span>
+                </option>
+              </select>
+            </div>
+            <div class="select flex-col flex">
+              <label> Select subcategory </label>
+              <select
+                v-model="selectedSubCategory"
+                class="block w-full px-4 py-2.5 text-gray-900 border border-gray-300 bg-gray-50 sm:text-md focus:border-blue-600 outline-0"
+                name="category"
+                id="category"
+              >
+                <option
+                  class="flex items-center space-x-2"
+                  :value="category"
+                  v-for="(category, index) in subCategories"
+                  :key="index"
+                >
+                  <img :src="category.icon" alt="icon" class="h-4" />
+                  <span> {{ category.title_ru }}</span>
+                </option>
+              </select>
+            </div>
+            <div class="select flex-col flex">
+              <label> Select sub-subcategory </label>
+              <select
+                v-model="selectedSubSubCategory"
+                class="block w-full px-4 py-2.5 text-gray-900 border border-gray-300 bg-gray-50 sm:text-md focus:border-blue-600 outline-0"
+                name="category"
+                id="category"
+              >
+                <option
+                  class="flex items-center space-x-2"
+                  :value="category"
+                  v-for="(category, index) in subSubCategories"
+                  :key="index"
+                >
+                  <span> {{ category.title_ru }}</span>
+                </option>
+              </select>
+            </div>
+            <div class="select flex-col flex">
+              <label> Select material </label>
+              <select
+                v-model="selectedMaterial"
+                class="block w-full px-4 py-2.5 text-gray-900 border border-gray-300 bg-gray-50 sm:text-md focus:border-blue-600 outline-0"
+                name="category"
+                id="category"
+              >
+                <option
+                  class="flex items-center space-x-2"
+                  :value="material.title_ru"
+                  v-for="(material, index) in materials"
+                  :key="index"
+                >
+                  <span> {{ material.title_ru }}</span>
+                </option>
+              </select>
+            </div>
             <BaseInput v-bind="$attrs" :label="'Price'" :type="'number'" v-model="price" />
             <BaseInput v-bind="$attrs" :label="'Quantity'" :type="'number'" v-model="availableQt" />
             <BaseInput v-bind="$attrs" :label="'Width'" :type="'number'" v-model="width" />
@@ -65,7 +135,9 @@ import SubmitButton from './SubmitButton.vue'
 import SelectImage from './SelectImage.vue'
 import BaseInput from '@/base/BaseInput.vue'
 import { loadModel, classifyImage } from '@/utils/tensorflowImageClassifier'
+import { useCategoryStore } from '@/stores/categories/categories'
 
+const categoryStore = useCategoryStore()
 const uploadImageStore = useUploadImageStore()
 const uploadMessages = computed(() => uploadImageStore.uploadMessages)
 const uploading = computed(() => uploadImageStore.uploading)
@@ -79,15 +151,114 @@ const availableQt = ref('5')
 const height = ref('20')
 const width = ref('12')
 const description = ref('Lorem ispum dolor')
-const category = ref('Mugs')
-const subcategory = ref('')
-const material = ref('Glass')
 const color = ref('')
 const colorName = ref('')
 const showColors = ref(false)
 const image = ref(null)
 const images = ref([])
 const colors = ref([])
+const materials = ref([
+  { id: 1, title_ru: 'Дерево', title_en: 'Wood' },
+  { id: 2, title_ru: 'Стекло', title_en: 'Glass' },
+  { id: 3, title_ru: 'Металл', title_en: 'Metal' },
+  { id: 4, title_ru: 'Пластик', title_en: 'Plastic' },
+  { id: 5, title_ru: 'Кожа', title_en: 'Leather' },
+  { id: 6, title_ru: 'Ткань', title_en: 'Fabric' },
+  { id: 7, title_ru: 'Керамика', title_en: 'Ceramic' },
+  { id: 8, title_ru: 'Картон', title_en: 'Cardboard' },
+  { id: 9, title_ru: 'Бетон', title_en: 'Concrete' },
+  { id: 10, title_ru: 'Резина', title_en: 'Rubber' },
+  { id: 11, title_ru: 'Алюминий', title_en: 'Aluminum' },
+  { id: 12, title_ru: 'Бронза', title_en: 'Bronze' },
+  { id: 13, title_ru: 'Нержавеющая сталь', title_en: 'Stainless Steel' },
+  { id: 14, title_ru: 'Медь', title_en: 'Copper' },
+  { id: 15, title_ru: 'Цинк', title_en: 'Zinc' },
+  { id: 16, title_ru: 'Латунь', title_en: 'Brass' },
+  { id: 17, title_ru: 'Камень', title_en: 'Stone' },
+  { id: 18, title_ru: 'Гипс', title_en: 'Gypsum' },
+  { id: 19, title_ru: 'Полиэстер', title_en: 'Polyester' },
+  { id: 20, title_ru: 'Нейлон', title_en: 'Nylon' },
+  { id: 21, title_ru: 'Акрил', title_en: 'Acrylic' },
+  { id: 22, title_ru: 'Полиуретан', title_en: 'Polyurethane' },
+  { id: 23, title_ru: 'Резина', title_en: 'Rubber' },
+  { id: 24, title_ru: 'Фанера', title_en: 'Plywood' },
+  { id: 25, title_ru: 'Стеклопластик', title_en: 'Fiberglass' },
+  { id: 26, title_ru: 'Картон', title_en: 'Cardboard' },
+  { id: 27, title_ru: 'Вата', title_en: 'Cotton Wool' },
+  { id: 28, title_ru: 'Мрамор', title_en: 'Marble' },
+  { id: 29, title_ru: 'Гранит', title_en: 'Granite' },
+  { id: 30, title_ru: 'Линолеум', title_en: 'Linoleum' },
+  { id: 31, title_ru: 'Масло', title_en: 'Oil' },
+  { id: 32, title_ru: 'Воск', title_en: 'Wax' },
+  { id: 33, title_ru: 'Шершавая бумага', title_en: 'Sandpaper' },
+  { id: 34, title_ru: 'Пленка', title_en: 'Film' },
+  { id: 35, title_ru: 'Титан', title_en: 'Titanium' },
+  { id: 36, title_ru: 'Пластилин', title_en: 'Plasticine' },
+  { id: 37, title_ru: 'Изолента', title_en: 'Electrical Tape' },
+  { id: 38, title_ru: 'Магнит', title_en: 'Magnet' },
+  { id: 39, title_ru: 'Глина', title_en: 'Clay' },
+  { id: 40, title_ru: 'Ртуть', title_en: 'Mercury' },
+  { id: 41, title_ru: 'Свинец', title_en: 'Lead' },
+  { id: 42, title_ru: 'Холст', title_en: 'Canvas' },
+  { id: 43, title_ru: 'Лак', title_en: 'Varnish' },
+  { id: 44, title_ru: 'Эпоксидная смола', title_en: 'Epoxy Resin' },
+  { id: 45, title_ru: 'Пробка', title_en: 'Cork' },
+  { id: 46, title_ru: 'Бумага', title_en: 'Paper' },
+  { id: 47, title_ru: 'Керамическая плитка', title_en: 'Ceramic Tile' },
+  { id: 48, title_ru: 'Силикон', title_en: 'Silicone' },
+  { id: 49, title_ru: 'Тефлон', title_en: 'Teflon' },
+  { id: 50, title_ru: 'Пенопласт', title_en: 'Foam' },
+  { id: 51, title_ru: 'Стеклянные волокна', title_en: 'Glass Fiber' },
+  { id: 52, title_ru: 'Ткань из углеродного волокна', title_en: 'Carbon Fiber Fabric' },
+  { id: 53, title_ru: 'Полиэтилен', title_en: 'Polyethylene' },
+  { id: 54, title_ru: 'Синтетическое волокно', title_en: 'Synthetic Fiber' },
+  { id: 55, title_ru: 'Деревянные волокна', title_en: 'Wood Fiber' },
+  { id: 56, title_ru: 'Лакокрасочное покрытие', title_en: 'Paint' },
+  { id: 57, title_ru: 'Анодированный алюминий', title_en: 'Anodized Aluminum' },
+  { id: 58, title_ru: 'Металлизированная пленка', title_en: 'Metalized Film' },
+  { id: 59, title_ru: 'Термопласт', title_en: 'Thermoplastic' },
+  { id: 60, title_ru: 'Морская древесина', title_en: 'Marine Wood' },
+  { id: 61, title_ru: 'Шершавая ткань', title_en: 'Rough Fabric' },
+  { id: 62, title_ru: 'Порошковое покрытие', title_en: 'Powder Coating' },
+  { id: 63, title_ru: 'Аэрозольная краска', title_en: 'Aerosol Paint' },
+  { id: 64, title_ru: 'Кожа наппа', title_en: 'Nappa Leather' },
+  { id: 65, title_ru: 'Картонная плита', title_en: 'Fiberboard' },
+  { id: 66, title_ru: 'Полипропилен', title_en: 'Polypropylene' },
+  { id: 67, title_ru: 'Меламиновая смола', title_en: 'Melamine Resin' },
+  { id: 68, title_ru: 'Вулканизированный каучук', title_en: 'Vulcanized Rubber' },
+  { id: 69, title_ru: 'Алюминиевый сплав', title_en: 'Aluminum Alloy' },
+  { id: 70, title_ru: 'Карбоновая пленка', title_en: 'Carbon Film' },
+  { id: 71, title_ru: 'Лавсан', title_en: 'Polyester Film' },
+  { id: 72, title_ru: 'Термоклей', title_en: 'Hot Melt Adhesive' },
+  { id: 73, title_ru: 'Преципитат', title_en: 'Precipitate' },
+  { id: 74, title_ru: 'Кремний', title_en: 'Silicon' },
+  { id: 75, title_ru: 'Гипсовая плита', title_en: 'Gypsum Board' },
+  { id: 76, title_ru: 'Ватин', title_en: 'Wadding' },
+  { id: 77, title_ru: 'Текстолит', title_en: 'Textolite' },
+  { id: 78, title_ru: 'Шпон', title_en: 'Veneer' },
+  { id: 79, title_ru: 'Нефтеполимер', title_en: 'Oil Polymer' },
+  { id: 80, title_ru: 'Металлическая сетка', title_en: 'Metal Mesh' },
+  { id: 81, title_ru: 'Гравий', title_en: 'Gravel' },
+  { id: 82, title_ru: 'Герметик', title_en: 'Sealant' },
+  { id: 83, title_ru: 'Резиновая крошка', title_en: 'Rubber Granules' },
+  { id: 84, title_ru: 'Алюмопластик', title_en: 'Alumoplast' },
+  { id: 85, title_ru: 'Пенополиуретан', title_en: 'Polyurethane Foam' },
+  { id: 86, title_ru: 'Акриловая краска', title_en: 'Acrylic Paint' },
+  { id: 87, title_ru: 'Пластиковая пленка', title_en: 'Plastic Film' },
+  { id: 88, title_ru: 'Термостойкий стеклофибр', title_en: 'Heat-resistant Glass Fiber' },
+  { id: 89, title_ru: 'Линолеум на основе ПВХ', title_en: 'PVC-based Linoleum' },
+  { id: 90, title_ru: 'Бумага для упаковки', title_en: 'Packaging Paper' },
+  { id: 91, title_ru: 'Антикоррозийное покрытие', title_en: 'Anti-corrosion Coating' },
+  { id: 92, title_ru: 'Фторопласт', title_en: 'Fluoroplastic' },
+  { id: 93, title_ru: 'Нейлоновая лента', title_en: 'Nylon Tape' },
+  { id: 94, title_ru: 'Картонная коробка', title_en: 'Cardboard Box' },
+  { id: 95, title_ru: 'Резиноткань', title_en: 'Rubber Fabric' },
+  { id: 96, title_ru: 'Полиуретановая пленка', title_en: 'Polyurethane Film' },
+  { id: 97, title_ru: 'Синтетическая кожа', title_en: 'Synthetic Leather' },
+  { id: 98, title_ru: 'Штампованная сталь', title_en: 'Stamped Steel' },
+  { id: 99, title_ru: 'Гибридный композит', title_en: 'Hybrid Composite' },
+  { id: 100, title_ru: 'Термостойкий полимер', title_en: 'Heat-resistant Polymer' }
+])
 const baseColors = reactive([
   { hex: '#FFFFFF', name: 'White' },
   { hex: '#000000', name: 'Black' },
@@ -108,6 +279,49 @@ const baseColors = reactive([
   { hex: '#FFC0CB', name: 'Pink' },
   { hex: '#FF69B4', name: 'HotPink' }
 ])
+
+const selectedCategory = ref(null)
+const selectedSubCategory = ref(null)
+const selectedSubSubCategory = ref(null)
+const selectedMaterial = ref(null)
+
+const categories = computed(() =>
+  categoryStore.allCategories.map((category) => ({
+    _id: category._id,
+    title_ru: category.title_ru,
+    title_en: category.title_en,
+    category_key: category.category_key
+  }))
+)
+
+const subCategories = computed(() => {
+  if (!selectedCategory.value) return []
+  const category = categoryStore.allCategories.find((cat) => cat._id === selectedCategory.value._id)
+  return category
+    ? category.subcategories.map((subcat) => ({
+        _id: subcat._id,
+        title_ru: subcat.title_ru,
+        title_en: subcat.title_en,
+        category_key: subcat.category_key
+      }))
+    : []
+})
+
+const subSubCategories = computed(() => {
+  if (!selectedSubCategory.value) return []
+  const category = categoryStore.allCategories.find((cat) => cat._id === selectedCategory.value._id)
+  const subcategory = category?.subcategories.find(
+    (subcat) => subcat._id === selectedSubCategory.value._id
+  )
+  return subcategory
+    ? subcategory.subSubcategories.map((subsubcat) => ({
+        _id: subsubcat._id,
+        title_ru: subsubcat.title_ru,
+        title_en: subsubcat.title_en,
+        category_key: subsubcat.category_key
+      }))
+    : []
+})
 
 const processImage = async (imageUrl) => {
   loadingImage.value = true
@@ -214,11 +428,12 @@ const createProduct = async () => {
       createdAt,
       title: title.value,
       price: price.value,
-      category: category.value,
-      subcategory: subcategory.value,
+      category: selectedCategory.value,
+      subCategory: selectedSubCategory.value,
+      subSubCategory: selectedSubSubCategory.value,
       color: color.value,
       colorName: colorName.value,
-      material: material.value,
+      material: selectedMaterial.value,
       image: images.value[0],
       height: numberHeight,
       width: numberWidth,
@@ -257,7 +472,8 @@ const handleClickOutside = (event) => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await categoryStore.fetchCategories()
   containerRef.value = document.getElementById('container')
   document.addEventListener('click', handleClickOutside)
 })

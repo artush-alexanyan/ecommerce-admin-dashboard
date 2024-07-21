@@ -13,6 +13,7 @@
           v-for="(category, index) in categories"
           :key="index"
         >
+          <img class="h-12 mr-2.5" :src="category.icon" alt="icon" />
           <span class="text-sm font-semibold"> {{ category.title_ru }} </span>
           <div
             v-if="category.showDetails"
