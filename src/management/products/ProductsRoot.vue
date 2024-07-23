@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-left text-xl font-semibold mb-5">Products</h1>
+    <h1 class="text-left text-xl font-semibold mb-5 uppercase">Products</h1>
     <div class="grid grid-cols-3 gap-10">
       <div class="col-span-2 bg-white p-5">
         <component :is="currentComponent"></component>

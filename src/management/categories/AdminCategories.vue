@@ -1,11 +1,13 @@
 <template>
   <div class="categories-root">
-    <h1 class="text-left text-xl font-semibold mb-5">Categories</h1>
+    <h1 class="text-left text-xl font-semibold mb-5 uppercase">Categories</h1>
     <div v-if="categoryFetching" class="flex items-center justify-center">
       <BaseLoader />
     </div>
     <div v-else class="category-list">
-      <div class="grid grid-cols-5 gap-5">
+      <div
+        class="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5"
+      >
         <div
           @mouseover="category.showDetails = true"
           @mouseleave="category.showDetails = false"

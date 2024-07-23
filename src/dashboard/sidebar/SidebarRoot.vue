@@ -9,23 +9,21 @@
           <ul>
             <li
               @click="changeTab(tab)"
-              class="py-4 px-3.5 my-5 cursor-pointer"
+              class="py-5 px-3.5 cursor-pointer"
               :class="{
                 'bg-primary text-white': generalCurrentTab === tab
               }"
               v-for="(list, tab) in generalList"
               :key="list.id"
             >
-              <div class="flex items-center space-x-2">
+              <router-link :to="list.path" class="font-semibold flex items-center space-x-2">
                 <unicon
                   :name="list.icon"
                   height="20"
                   :fill="generalCurrentTab === tab ? 'white' : ''"
                 ></unicon>
-                <router-link :to="list.path" class="text-sm font-semibold">
-                  {{ list.title }}
-                </router-link>
-              </div>
+                <span> {{ list.title }}</span>
+              </router-link>
             </li>
           </ul>
         </div>
@@ -81,10 +79,11 @@ const router = useRouter()
 const generalList = ref([
   { id: 0, icon: 'apps', path: '/', title: 'Dashboard' },
   { id: 1, icon: 'layer-group', path: '/products', title: 'Products' },
-  { id: 2, icon: 'shopping-cart', path: '/', title: 'Orders' },
-  { id: 3, icon: 'user', path: '/', title: 'Customers' },
-  { id: 4, icon: 'setting', path: '/', title: 'Settings' },
-  { id: 5, icon: 'list-ul', path: '/categories', title: 'Categories' }
+  // { id: 2, icon: 'shopping-cart', path: '/', title: 'Orders' },
+  // { id: 3, icon: 'user', path: '/', title: 'Customers' },
+  // { id: 4, icon: 'setting', path: '/', title: 'Settings' },
+  { id: 5, icon: 'list-ul', path: '/categories', title: 'Categories' },
+  { id: 5, icon: 'wordpress', path: '/brands', title: 'Brands' }
 ])
 
 const generalCurrentTab = ref(0)

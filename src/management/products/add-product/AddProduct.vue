@@ -14,10 +14,10 @@
               v-model="description"
             />
             <div class="select flex-col flex">
-              <label> Select category </label>
+              <label class="font-semibold"> Select category </label>
               <select
                 v-model="selectedCategory"
-                class="block w-full px-4 py-2.5 text-gray-900 border border-gray-300 bg-gray-50 sm:text-md focus:border-blue-600 outline-0"
+                class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-12 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
                 name="category"
                 id="category"
               >
@@ -33,29 +33,29 @@
               </select>
             </div>
             <div class="select flex-col flex">
-              <label> Select subcategory </label>
+              <label class="font-semibold"> Select subcategory </label>
               <select
                 v-model="selectedSubCategory"
-                class="block w-full px-4 py-2.5 text-gray-900 border border-gray-300 bg-gray-50 sm:text-md focus:border-blue-600 outline-0"
+                class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-12 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
                 name="category"
                 id="category"
               >
                 <option
-                  class="flex items-center space-x-2"
+                  class="flex items-center"
                   :value="category"
                   v-for="(category, index) in subCategories"
                   :key="index"
                 >
-                  <img :src="category.icon" alt="icon" class="h-4" />
                   <span> {{ category.title_ru }}</span>
                 </option>
               </select>
             </div>
+
             <div class="select flex-col flex">
-              <label> Select sub-subcategory </label>
+              <label class="font-semibold"> Select sub-subcategory </label>
               <select
                 v-model="selectedSubSubCategory"
-                class="block w-full px-4 py-2.5 text-gray-900 border border-gray-300 bg-gray-50 sm:text-md focus:border-blue-600 outline-0"
+                class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-12 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
                 name="category"
                 id="category"
               >
@@ -70,10 +70,28 @@
               </select>
             </div>
             <div class="select flex-col flex">
-              <label> Select material </label>
+              <label class="font-semibold"> Select brand </label>
+              <select
+                v-model="selectedBrand"
+                class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-12 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
+                name="category"
+                id="category"
+              >
+                <option
+                  class="flex items-center"
+                  :value="brand"
+                  v-for="(brand, index) in brands"
+                  :key="index"
+                >
+                  <span> {{ brand.title }}</span>
+                </option>
+              </select>
+            </div>
+            <div class="select flex-col flex">
+              <label class="font-semibold"> Select material </label>
               <select
                 v-model="selectedMaterial"
-                class="block w-full px-4 py-2.5 text-gray-900 border border-gray-300 bg-gray-50 sm:text-md focus:border-blue-600 outline-0"
+                class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-12 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
                 name="category"
                 id="category"
               >
@@ -110,7 +128,7 @@
           </div>
           <SubmitButton :loading="loading" :uploading="loadingImage" :btnText="btnText" />
         </form>
-        <div class="uploaded-images my-10">
+        <div class="uploaded-images my-10" v-if="images.length > 0">
           <p class="font-semibold">Uploaded Images</p>
           <div class="images">
             <ul class="flex items-center space-x-2">
@@ -279,11 +297,14 @@ const baseColors = reactive([
   { hex: '#FFC0CB', name: 'Pink' },
   { hex: '#FF69B4', name: 'HotPink' }
 ])
+const brandLoading = ref(false)
+const brands = ref([])
 
 const selectedCategory = ref(null)
 const selectedSubCategory = ref(null)
 const selectedSubSubCategory = ref(null)
 const selectedMaterial = ref(null)
+const selectedBrand = ref(null)
 
 const categories = computed(() =>
   categoryStore.allCategories.map((category) => ({
@@ -471,9 +492,27 @@ const handleClickOutside = (event) => {
     showColors.value = false
   }
 }
+const getBrands = async () => {
+  brandLoading.value = true
+  try {
+    const response = await BASE_URL.get('/brands/get')
+    console.log('response.data', response.data.brands)
+    const results = response.data.brands
+    brands.value = results.map((brand) => ({
+      showDetails: false,
+      deleting: false,
+      ...brand
+    }))
+    brandLoading.value = false
+  } catch (error) {
+    brandLoading.value = false
+    alert(error.response ? error.response.data.message : error.message)
+  }
+}
 
 onMounted(async () => {
   await categoryStore.fetchCategories()
+  await getBrands()
   containerRef.value = document.getElementById('container')
   document.addEventListener('click', handleClickOutside)
 })

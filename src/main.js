@@ -11,6 +11,7 @@ import customGoogleIcon from './assets/icons/custom-google'
 import customArrowLeft from './assets/icons/custom-arrow-left'
 import customShoppingBag from './assets/icons/custom-shopping-bag'
 import customHomeIcon from './assets/icons/custom-home'
+import customLogo from './assets/icons/custom-logo'
 import {
   uniEnvelope,
   uniLock,
@@ -55,7 +56,8 @@ import {
   uniExclamationOctagon,
   uniTimesCircle,
   uniSpinner,
-  uniTimes
+  uniTimes,
+  uniWordpress
 } from 'vue-unicons/dist/icons'
 
 Unicon.add([
@@ -104,11 +106,13 @@ Unicon.add([
   uniTimesCircle,
   uniSpinner,
   uniTimes,
+  uniWordpress,
   customArrowLeft,
   customGoogleIcon,
   customUserIcon,
   customShoppingBag,
-  customHomeIcon
+  customHomeIcon,
+  customLogo
 ])
 
 const app = createApp(App)

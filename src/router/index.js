@@ -27,6 +27,11 @@ const router = createRouter({
           path: 'categories',
           name: 'AdminCategories',
           component: () => import('../management/categories/AdminCategories.vue')
+        },
+        {
+          path: 'brands',
+          name: 'BrandsRoot',
+          component: () => import('../management/brands/BrandsRoot.vue')
         }
       ]
     }
