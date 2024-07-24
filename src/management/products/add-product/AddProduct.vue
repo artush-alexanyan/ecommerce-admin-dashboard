@@ -133,7 +133,7 @@
           <div class="images">
             <ul class="flex items-center space-x-2">
               <li v-for="(image, index) in images" :key="index">
-                <img class="h-12 rounded" :src="image" alt="uploaded-image" />
+                <img class="h-12 rounded" :src="image.url" alt="uploaded-image" />
               </li>
             </ul>
           </div>
@@ -415,7 +415,13 @@ const uploadNewImage = async () => {
   }
   const folderName = 'products'
   const imageUrl = await uploadImageStore.uploadImage(image.value, folderName)
-  images.value.push(imageUrl)
+  images.value.push({
+    url: imageUrl,
+    alt: title.value,
+    title: title.value,
+    caption: title.value,
+    color: 'black'
+  })
 }
 const createProduct = async () => {
   const createdAt = new Date()
@@ -441,7 +447,7 @@ const createProduct = async () => {
     resetMessages()
     return
   }
-  const classificationResults = await processImage(images.value[0])
+  const classificationResults = await processImage(images.value[0].url)
   console.log('classificationResults', classificationResults)
   loading.value = true
   try {
@@ -455,7 +461,8 @@ const createProduct = async () => {
       color: color.value,
       colorName: colorName.value,
       material: selectedMaterial.value,
-      image: images.value[0],
+      defaultImage: images.value[0].url,
+      brand: selectedBrand.value,
       height: numberHeight,
       width: numberWidth,
       description: description.value,
