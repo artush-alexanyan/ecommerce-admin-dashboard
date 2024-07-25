@@ -13,7 +13,10 @@ export const useProductsFetchStore = defineStore('ProductsFetchStore', {
         this.productsLoading = true
         const response = await BASE_URL.get('/products/get')
         const productData = response.data.products
-        this.products = productData
+        this.products = productData.map((product) => ({
+          ...product,
+          showDetails: false
+        }))
         this.productsLoading = false
       } catch (error) {
         this.productsLoading = false

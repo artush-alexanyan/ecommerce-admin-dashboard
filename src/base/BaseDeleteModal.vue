@@ -4,7 +4,7 @@
       enter-active-class="animate__animated animate__bounceIn animate__faster"
       leave-active-class="animate__animated animate__zoomOut animate__faster"
     >
-      <div v-if="showDelete" class="fixed inset-0 flex items-center justify-center">
+      <div v-if="showDelete" class="fixed inset-0 z-30 flex items-center justify-center">
         <div
           class="h-40 w-96 bg-white border border-gray-100 shadow-xl rounded flex flex-col items-center justify-center space-y-10"
         >

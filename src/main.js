@@ -57,7 +57,9 @@ import {
   uniTimesCircle,
   uniSpinner,
   uniTimes,
-  uniWordpress
+  uniWordpress,
+  uniImagePlus,
+  uniCloudUpload
 } from 'vue-unicons/dist/icons'
 
 Unicon.add([
@@ -107,6 +109,8 @@ Unicon.add([
   uniSpinner,
   uniTimes,
   uniWordpress,
+  uniImagePlus,
+  uniCloudUpload,
   customArrowLeft,
   customGoogleIcon,
   customUserIcon,

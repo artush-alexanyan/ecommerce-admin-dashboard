@@ -1,8 +1,8 @@
 <template>
   <div>
     <h1 class="text-left text-xl font-semibold mb-5 uppercase">Products</h1>
-    <div class="grid grid-cols-3 gap-10">
-      <div class="col-span-2 bg-white p-5">
+    <div class="grid grid-cols-7 gap-5">
+      <div class="col-span-6 bg-white p-5">
         <component :is="currentComponent"></component>
       </div>
       <div class="col-span-1 bg-white p-5">

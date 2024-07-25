@@ -4,7 +4,7 @@
       type="submit"
       :disabled="props.loading || props.uploading"
       name="add-product"
-      class="w-full px-4 py-2.5 bg-green-600 text-white sm:text-md outline-0 flex items-center justify-center"
+      class="w-full rounded-xl px-4 py-2.5 bg-green-600 text-white sm:text-md outline-0 flex items-center justify-center"
     >
       <span>{{ btnText() }}</span>
       <unicon
