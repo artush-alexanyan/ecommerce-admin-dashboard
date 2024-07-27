@@ -11,7 +11,13 @@
       <ImagesPopup
         :show-images-popup="showImagesPopup"
         :product-id="markedProductId"
+        :variants="variants"
         @close-images-popup="closeImagesPopup"
+      />
+      <VariantPopup
+        :show-variant-popup="showVariantPopup"
+        :product-id="markedProductId"
+        @close-variant-popup="closeVariantPopup"
       />
       <BaseDeleteModal
         :showDelete="showDelete"
@@ -51,13 +57,18 @@
               </div>
               <div class="flex flex-col space-y-2.5">
                 <button
+                  :disabled="variantsLoading"
                   @click="openImagesPopup(product._id)"
                   type="button"
                   class="bg-blue-600 text-white px-5 py-2.5 rounded"
                 >
-                  Add images
+                  {{ !variantsLoading ? 'Add images' : 'Loading...' }}
                 </button>
-                <button type="button" class="bg-blue-600 text-white px-5 py-2.5 rounded">
+                <button
+                  @click="openVariantPopup(product._id)"
+                  type="button"
+                  class="bg-blue-600 text-white px-5 py-2.5 rounded"
+                >
                   Add variant
                 </button>
               </div>
@@ -86,6 +97,7 @@ import IconView from '@/icons/IconView.vue'
 import BASE_URL from '@/backand/api'
 import NewProductPopupVue from './NewProductPopup.vue.vue'
 import ImagesPopup from './ImagesPopup.vue'
+import VariantPopup from './VariantPopup.vue'
 
 const showEditModal = ref(false)
 const showDelete = ref(false)
@@ -97,16 +109,39 @@ const productsLoading = computed(() => productsFetchStore.productsLoading)
 const editedProduct = ref(null)
 const showNewProductPopup = ref(false)
 const showImagesPopup = ref(false)
+const showVariantPopup = ref(false)
 const markedProductId = ref(null)
+const variantsLoading = ref(false)
+const variants = ref([])
 
 const closeImagesPopup = () => {
   showImagesPopup.value = false
 }
-const openImagesPopup = (productId) => {
+const openImagesPopup = async (productId) => {
+  console.log('ProductId', productId)
+  variantsLoading.value = true
+  try {
+    const response = await BASE_URL.get(`/products/${productId}/variants`)
+    console.log('variants', response.data.variants)
+    variants.value = response.data.variants
+    markedProductId.value = productId
+    variantsLoading.value = false
+    showImagesPopup.value = true
+  } catch (error) {
+    variantsLoading.value = false
+    alert(error.response ? error.respose.data.message : error.message)
+  }
+}
+
+const closeVariantPopup = () => {
+  showVariantPopup.value = false
+}
+const openVariantPopup = (productId) => {
   console.log('ProductId', productId)
   markedProductId.value = productId
-  showImagesPopup.value = true
+  showVariantPopup.value = true
 }
+
 const openNewProductPopup = () => {
   showNewProductPopup.value = true
 }

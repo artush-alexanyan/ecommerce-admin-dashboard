@@ -8,120 +8,55 @@
         v-if="showNewProductPopup"
         class="fixed top-0 left-0 z-30 bg-black/50 w-full h-screen flex p-5 justify-center"
       >
-        <div class="bg-white p-5 rounded-[30px] w-1/2">
-          <BaseAlert :messages="messages || uploadMessages" />
-          <div>
+        <div class="bg-white p-5 rounded-[30px] w-3/4 grid md:grid-cols-3 gap-5">
+          <div class="md:col-span-2">
+            <BaseAlert :messages="messages || uploadMessages" />
             <div class="flex items-center justify-between pb-5 border-b border-b-gray-200">
               <p class="text-xl font-semibold">Add a new product</p>
               <button type="button" @click="emit('close-new-product-popup')">
                 <unicon name="times" fill="black"></unicon>
               </button>
             </div>
+
             <div class="mt-5 text-sm">
               <form @submit.prevent="createProduct">
-                <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 md:gap-4 gap-2">
+                <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 md:gap-4 gap-2">
                   <BaseInput v-bind="$attrs" :label="'Title'" :type="'text'" v-model="title" />
-                  <div class="select flex-col flex">
-                    <label class="font-semibold"> Select category </label>
-                    <select
-                      v-model="selectedCategory"
-                      class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-2.5 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
-                      name="category"
-                      id="category"
-                    >
-                      <option
-                        class="flex items-center space-x-2"
-                        :value="category"
-                        v-for="(category, index) in categories"
-                        :key="index"
-                      >
-                        <img :src="category.icon" alt="icon" class="h-4" />
-                        <span> {{ category.title_ru }}</span>
-                      </option>
-                    </select>
-                  </div>
-                  <div class="select flex-col flex">
-                    <label class="font-semibold"> Select subcategory </label>
-                    <select
-                      v-model="selectedSubCategory"
-                      class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-2.5 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
-                      name="category"
-                      id="category"
-                    >
-                      <option
-                        class="flex items-center"
-                        :value="category"
-                        v-for="(category, index) in subCategories"
-                        :key="index"
-                      >
-                        <span> {{ category.title_ru }}</span>
-                      </option>
-                    </select>
-                  </div>
 
-                  <div class="select flex-col flex">
-                    <label class="font-semibold"> Select sub-subcategory </label>
-                    <select
-                      v-model="selectedSubSubCategory"
-                      class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-2.5 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
-                      name="category"
-                      id="category"
-                    >
-                      <option
-                        class="flex items-center space-x-2"
-                        :value="category"
-                        v-for="(category, index) in subSubCategories"
-                        :key="index"
-                      >
-                        <span> {{ category.title_ru }}</span>
-                      </option>
-                    </select>
-                  </div>
-                  <div class="select flex-col flex">
-                    <label class="font-semibold"> Select brand </label>
-                    <select
-                      v-model="selectedBrand"
-                      class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-2.5 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
-                      name="category"
-                      id="category"
-                    >
-                      <option
-                        class="flex items-center"
-                        :value="brand"
-                        v-for="(brand, index) in brands"
-                        :key="index"
-                      >
-                        <span> {{ brand.title }}</span>
-                      </option>
-                    </select>
-                  </div>
-                  <div class="select flex-col flex">
-                    <label class="font-semibold"> Select material </label>
-                    <select
-                      v-model="selectedMaterial"
-                      class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-2.5 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
-                      name="category"
-                      id="category"
-                    >
-                      <option
-                        class="flex items-center space-x-2"
-                        :value="material.title_ru"
-                        v-for="(material, index) in materials"
-                        :key="index"
-                      >
-                        <span> {{ material.title_ru }}</span>
-                      </option>
-                    </select>
-                  </div>
-                  <BaseInput v-bind="$attrs" :label="'Price'" :type="'number'" v-model="price" />
-                  <BaseInput
-                    v-bind="$attrs"
-                    :label="'Quantity'"
-                    :type="'number'"
-                    v-model="availableQt"
+                  <BaseSelect
+                    :items="categories"
+                    :label="'category'"
+                    :selected-item="selectedCategory"
+                    @select-item="selectCategory"
                   />
-                  <BaseInput v-bind="$attrs" :label="'Width'" :type="'number'" v-model="width" />
-                  <BaseInput v-bind="$attrs" :label="'Height'" :type="'number'" v-model="height" />
+
+                  <BaseSelect
+                    :items="subCategories"
+                    :label="'subcategory'"
+                    :selected-item="selectedSubCategory"
+                    @select-item="selectSubCategory"
+                  />
+
+                  <BaseSelect
+                    :items="subSubCategories"
+                    :label="'sub-subcategory'"
+                    :selected-item="selectedSubSubCategory"
+                    @select-item="selectSubSubCategory"
+                  />
+
+                  <BaseSelect
+                    :items="brands"
+                    :label="'brand'"
+                    :selected-item="selectedBrand"
+                    @select-item="selectBrand"
+                  />
+
+                  <BaseSelect
+                    :items="countryData"
+                    :label="'manufacturer'"
+                    :selected-item="madeIn"
+                    @select-item="selectCountry"
+                  />
                 </div>
                 <div class="flex flex-col items-left">
                   <label>
@@ -132,18 +67,28 @@
                       name=""
                       id=""
                       cols="30"
-                      rows="2"
+                      rows="4"
                     ></textarea>
                   </label>
                 </div>
-                <div class="grid md:grid-cols-2 md:gap-4 gap-2">
-                  <ColorSelect
-                    :baseColors="baseColors"
-                    :color="color"
-                    :showColors="showColors"
-                    @select-color="selectColor"
-                    @toggle-colors="toggleColors"
+                <div class="flex items-center justify-between space-x-2">
+                  <input
+                    :disabled="generating"
+                    placeholder="Set rules to generate description"
+                    v-model="gptQuery"
+                    type="text"
+                    class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-2.5 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
                   />
+                  <button
+                    class="bg-blue-600 text-white px-5 py-3 rounded-xl"
+                    :disabled="generating"
+                    @click="sendAssistanceMessage"
+                    type="button"
+                  >
+                    {{ generating ? 'Sending' : 'Send' }}
+                  </button>
+                </div>
+                <div class="grid md:grid-cols-2 md:gap-4 gap-2 mt-10">
                   <SelectImage
                     :image="image"
                     :loading="loading"
@@ -151,8 +96,8 @@
                     @handle-file-selection="handleFileSelection"
                     @upload-image="uploadNewImage"
                   />
+                  <SubmitButton :loading="loading" :uploading="loadingImage" :btnText="btnText" />
                 </div>
-                <SubmitButton :loading="loading" :uploading="loadingImage" :btnText="btnText" />
               </form>
               <div class="uploaded-images my-5 flex flex-col items-center" v-if="defaultImageUrl">
                 <p class="font-semibold mg-2.5 text-sm">Default image</p>
@@ -164,22 +109,40 @@
               </div>
             </div>
           </div>
+          <div class="border-l border-l-gray-200 p-2.5">
+            <ColorSelect
+              :colors="colors"
+              :selected-color="selectedColor"
+              @select-color="selectColor"
+            />
+            <hr class="my-2.5" />
+            <MaterialSelect
+              :materials="materials"
+              :materials-data="materialsData"
+              @select-item="selectMaterial"
+            />
+            <hr class="my-2.5" />
+            <SizeSelect :sizes="sizes" :sizes-data="sizeData" @select-item="selectSize" />
+          </div>
         </div></div
     ></Transition>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useUploadImageStore } from '@/stores/upload-image/upload-image'
 import BASE_URL from '@/backand/api'
 import BaseAlert from '@/base/BaseAlert.vue'
-import ColorSelect from './ColorSelect.vue'
 import SubmitButton from './SubmitButton.vue'
 import SelectImage from './SelectImage.vue'
 import BaseInput from '@/base/BaseInput.vue'
 import { loadModel, classifyImage } from '@/utils/tensorflowImageClassifier'
 import { useCategoryStore } from '@/stores/categories/categories'
+import BaseSelect from './BaseSelect.vue'
+import ColorSelect from './ColorSelect.vue'
+import MaterialSelect from './MaterialSelect.vue'
+import SizeSelect from './SizeSelect.vue'
 
 const props = defineProps({
   showNewProductPopup: Boolean
@@ -197,16 +160,18 @@ const loadingImage = ref(false)
 const messages = ref([])
 const title = ref('')
 const price = ref('')
-const availableQt = ref('')
 const height = ref('')
 const width = ref('')
 const description = ref('')
 const color = ref('')
-const colorName = ref('')
+const hex = ref('')
+const colors = ref([])
+const materials = ref([])
+const sizes = ref([])
 const showColors = ref(false)
 const image = ref(null)
 const defaultImageUrl = ref(null)
-const materials = ref([
+const materialsData = ref([
   { id: 1, title_ru: 'Дерево', title_en: 'Wood' },
   { id: 2, title_ru: 'Стекло', title_en: 'Glass' },
   { id: 3, title_ru: 'Металл', title_en: 'Metal' },
@@ -308,34 +273,162 @@ const materials = ref([
   { id: 99, title_ru: 'Гибридный композит', title_en: 'Hybrid Composite' },
   { id: 100, title_ru: 'Термостойкий полимер', title_en: 'Heat-resistant Polymer' }
 ])
-const baseColors = reactive([
-  { hex: '#FFFFFF', name: 'White' },
-  { hex: '#000000', name: 'Black' },
-  { hex: '#FF0000', name: 'Red' },
-  { hex: '#00FF00', name: 'Green' },
-  { hex: '#0000FF', name: 'Blue' },
-  { hex: '#FFFF00', name: 'Yellow' },
-  { hex: '#FF00FF', name: 'Magenta' },
-  { hex: '#00FFFF', name: 'Cyan' },
-  { hex: '#808080', name: 'Gray' },
-  { hex: '#800000', name: 'Maroon' },
-  { hex: '#808000', name: 'Olive' },
-  { hex: '#008000', name: 'Green' },
-  { hex: '#800080', name: 'Purple' },
-  { hex: '#008080', name: 'Teal' },
-  { hex: '#C0C0C0', name: 'Silver' },
-  { hex: '#FFA500', name: 'Orange' },
-  { hex: '#FFC0CB', name: 'Pink' },
-  { hex: '#FF69B4', name: 'HotPink' }
+const sizeData = ref([
+  { title: 'Clothing XS', size: 'XS' },
+  { title: 'Clothing S', size: 'S' },
+  { title: 'Clothing M', size: 'M' },
+  { title: 'Clothing L', size: 'L' },
+  { title: 'Clothing XL', size: 'XL' },
+  { title: 'Clothing XXL', size: 'XXL' },
+  { title: 'Clothing Numeric 28 (RU 44)', size: '28' },
+  { title: 'Clothing Numeric 30 (RU 46)', size: '30' },
+  { title: 'Clothing Numeric 32 (RU 48)', size: '32' },
+  { title: 'Clothing Numeric 34 (RU 50)', size: '34' },
+  { title: 'Clothing Numeric 36 (RU 52)', size: '36' },
+  { title: 'Clothing Numeric 38 (RU 54)', size: '38' },
+  { title: 'Clothing Numeric 40 (RU 56)', size: '40' },
+  { title: 'Clothing Numeric 42 (RU 58)', size: '42' },
+  { title: 'Clothing Numeric 44 (RU 60)', size: '44' },
+  { title: "Children's Clothing 2T", size: '2T' },
+  { title: "Children's Clothing 3T", size: '3T' },
+  { title: "Children's Clothing 4T", size: '4T' },
+  { title: "Children's Clothing 5", size: '5' },
+  { title: "Children's Clothing 6", size: '6' },
+  { title: "Children's Clothing 7", size: '7' },
+  { title: "Children's Clothing 8", size: '8' },
+  { title: "Children's Clothing 10", size: '10' },
+  { title: "Children's Clothing 12", size: '12' },
+  { title: "Children's Clothing 14", size: '14' },
+  { title: 'Shoe US 5 (RU 35)', size: '5' },
+  { title: 'Shoe US 6 (RU 36)', size: '6' },
+  { title: 'Shoe US 7 (RU 37)', size: '7' },
+  { title: 'Shoe US 8 (RU 38)', size: '8' },
+  { title: 'Shoe US 9 (RU 39)', size: '9' },
+  { title: 'Shoe US 10 (RU 40)', size: '10' },
+  { title: 'Shoe US 11 (RU 41)', size: '11' },
+  { title: 'Shoe US 12 (RU 42)', size: '12' },
+  { title: 'Shoe US 13 (RU 43)', size: '13' },
+  { title: 'Shoe US 14 (RU 44)', size: '14' },
+  { title: 'Shoe EU 38', size: '38' },
+  { title: 'Shoe EU 39', size: '39' },
+  { title: 'Shoe EU 40', size: '40' },
+  { title: 'Shoe EU 41', size: '41' },
+  { title: 'Shoe EU 42', size: '42' },
+  { title: 'Shoe EU 43', size: '43' },
+  { title: 'Shoe EU 44', size: '44' },
+  { title: 'Shoe EU 45', size: '45' },
+  { title: 'Shoe EU 46', size: '46' },
+  { title: 'Shoe EU 47', size: '47' },
+  { title: 'Shoe UK 4 (RU 36)', size: '4' },
+  { title: 'Shoe UK 5 (RU 37)', size: '5' },
+  { title: 'Shoe UK 6 (RU 38)', size: '6' },
+  { title: 'Shoe UK 7 (RU 39)', size: '7' },
+  { title: 'Shoe UK 8 (RU 40)', size: '8' },
+  { title: 'Shoe UK 9 (RU 41)', size: '9' },
+  { title: 'Shoe UK 10 (RU 42)', size: '10' },
+  { title: 'Shoe UK 11 (RU 43)', size: '11' },
+  { title: 'Shoe UK 12 (RU 44)', size: '12' },
+  { title: 'Shoe UK 13 (RU 45)', size: '13' },
+  { title: 'Ring US 3', size: '3' },
+  { title: 'Ring US 3.5', size: '3.5' },
+  { title: 'Ring US 4', size: '4' },
+  { title: 'Ring US 4.5', size: '4.5' },
+  { title: 'Ring US 5', size: '5' },
+  { title: 'Ring US 5.5', size: '5.5' },
+  { title: 'Ring US 6', size: '6' },
+  { title: 'Ring US 6.5', size: '6.5' },
+  { title: 'Ring US 7', size: '7' },
+  { title: 'Ring US 7.5', size: '7.5' },
+  { title: 'Ring US 8', size: '8' },
+  { title: 'Ring US 8.5', size: '8.5' },
+  { title: 'Ring US 9', size: '9' },
+  { title: 'Ring US 9.5', size: '9.5' },
+  { title: 'Ring US 10', size: '10' },
+  { title: 'Ring US 10.5', size: '10.5' },
+  { title: 'Ring US 11', size: '11' },
+  { title: 'Ring US 11.5', size: '11.5' },
+  { title: 'Ring US 12', size: '12' },
+  { title: 'Ring US 12.5', size: '12.5' },
+  { title: 'Ring US 13', size: '13' },
+  { title: 'Ring UK F', size: 'F' },
+  { title: 'Ring UK G', size: 'G' },
+  { title: 'Ring UK H', size: 'H' },
+  { title: 'Ring UK I', size: 'I' },
+  { title: 'Ring UK J', size: 'J' },
+  { title: 'Ring UK K', size: 'K' },
+  { title: 'Ring UK L', size: 'L' },
+  { title: 'Ring UK M', size: 'M' },
+  { title: 'Ring UK N', size: 'N' },
+  { title: 'Ring UK O', size: 'O' },
+  { title: 'Ring UK P', size: 'P' },
+  { title: 'Ring UK Q', size: 'Q' },
+  { title: 'Ring UK R', size: 'R' },
+  { title: 'Ring UK S', size: 'S' },
+  { title: 'Ring UK T', size: 'T' },
+  { title: 'Ring UK U', size: 'U' },
+  { title: 'Ring UK V', size: 'V' },
+  { title: 'Ring UK W', size: 'W' },
+  { title: 'Ring UK X', size: 'X' },
+  { title: 'Ring UK Y', size: 'Y' },
+  { title: 'Ring UK Z', size: 'Z' },
+  { title: 'Furniture Small 18x18x18 inches', size: '18x18x18' },
+  { title: 'Furniture Small 24x24x24 inches', size: '24x24x24' },
+  { title: 'Furniture Medium 36x36x36 inches', size: '36x36x36' },
+  { title: 'Furniture Medium 48x48x48 inches', size: '48x48x48' },
+  { title: 'Furniture Large 60x60x60 inches', size: '60x60x60' },
+  { title: 'Furniture Large 72x72x72 inches', size: '72x72x72' },
+  { title: 'Electronics Screen 13 inches', size: '13"' },
+  { title: 'Electronics Screen 15 inches', size: '15"' },
+  { title: 'Electronics Screen 17 inches', size: '17"' },
+  { title: 'Electronics Screen 19 inches', size: '19"' },
+  { title: 'Electronics Screen 21 inches', size: '21"' },
+  { title: 'Electronics Screen 24 inches', size: '24"' },
+  { title: 'Electronics Screen 27 inches', size: '27"' },
+  { title: 'Electronics Screen 32 inches', size: '32"' },
+  { title: 'Electronics Screen 40 inches', size: '40"' },
+  { title: 'Electronics Screen 50 inches', size: '50"' },
+  { title: 'Electronics Screen 55 inches', size: '55"' },
+  { title: 'Electronics Screen 60 inches', size: '60"' },
+  { title: 'Electronics Screen 65 inches', size: '65"' },
+  { title: 'Electronics Screen 70 inches', size: '70"' },
+  { title: 'Electronics Screen 75 inches', size: '75"' },
+  { title: 'Electronics Storage 32GB', size: '32GB' },
+  { title: 'Electronics Storage 64GB', size: '64GB' },
+  { title: 'Electronics Storage 128GB', size: '128GB' },
+  { title: 'Electronics Storage 256GB', size: '256GB' },
+  { title: 'Electronics Storage 512GB', size: '512GB' },
+  { title: 'Electronics Storage 1TB', size: '1TB' },
+  { title: 'Electronics Storage 2TB', size: '2TB' },
+  { title: 'Electronics Storage 4TB', size: '4TB' },
+  { title: 'General Small 10x10x10 cm', size: '10x10x10 cm' },
+  { title: 'General Medium 30x30x30 cm', size: '30x30x30 cm' },
+  { title: 'General Large 50x50x50 cm', size: '50x50x50 cm' },
+  { title: 'General Extra Large 70x70x70 cm', size: '70x70x70 cm' }
 ])
+const countryData = ['Russia', 'China', 'Armenia']
 const brandLoading = ref(false)
 const brands = ref([])
-
+const gptQuery = ref('I need product description in russian minimum 200 character length for')
+const generating = ref(false)
 const selectedCategory = ref(null)
 const selectedSubCategory = ref(null)
 const selectedSubSubCategory = ref(null)
-const selectedMaterial = ref(null)
 const selectedBrand = ref(null)
+const selectedColor = ref(null)
+const madeIn = ref(null)
+
+const sendAssistanceMessage = async () => {
+  generating.value = true
+  try {
+    const response = await BASE_URL.post('/generate-text', { text: gptQuery.value })
+    console.log('response', response.data)
+    description.value = response.data.text
+    generating.value = false
+  } catch (error) {
+    generating.value = false
+    console.error(error)
+  }
+}
 
 const resetProductForm = () => {
   title.value = ''
@@ -344,13 +437,48 @@ const resetProductForm = () => {
   height.value = ''
   width.value = ''
   color.value = ''
-  colorName.value = ''
+  hex.value = ''
   showColors.value = false
   defaultImageUrl.value = null
   selectedBrand.value = null
   selectedCategory.value = null
   selectedSubCategory.value = null
   selectedSubSubCategory.value = null
+}
+
+const selectCategory = (item) => {
+  console.log('item', item)
+  selectedCategory.value = item
+}
+
+const selectSubCategory = (item) => {
+  selectedSubCategory.value = item
+}
+
+const selectSubSubCategory = (item) => {
+  selectedSubSubCategory.value = item
+}
+
+const selectBrand = (item) => {
+  console.log(item)
+  selectedBrand.value = item
+}
+
+const selectColor = (item) => {
+  colors.value.push(item)
+}
+
+const selectMaterial = (item) => {
+  console.log('item', item)
+  materials.value.push(item)
+}
+
+const selectSize = (item) => {
+  sizes.value.push(item)
+}
+
+const selectCountry = (item) => {
+  madeIn.value = item
 }
 
 const categories = computed(() =>
@@ -416,16 +544,6 @@ const processImage = async (imageUrl) => {
   })
 }
 
-const toggleColors = () => {
-  showColors.value = !showColors.value
-}
-
-const selectColor = (colorOption) => {
-  color.value = colorOption.hex
-  colorName.value = colorOption.name
-  showColors.value = false
-}
-
 const btnText = () => {
   if (loadingImage.value === true) {
     return 'Getting classifications...'
@@ -465,14 +583,9 @@ const uploadNewImage = async () => {
   defaultImageUrl.value = imageUrl
 }
 const createProduct = async () => {
-  const createdAt = new Date()
-  const numberHeight = Number(height.value)
-  const numberWidth = Number(width.value)
-  const newAvailableQt = Number(availableQt.value)
-  console.log('Number(availableQt.value)', Number(availableQt.value))
-  if (color.value === '') {
+  if (colors.value.length === 0 || materials.value.length === 0 || sizes.value.length === 0) {
     messages.value.push({
-      message: 'Please select color',
+      message: 'Please add all characteristics',
       type: 'Warning'
     })
     loading.value = false
@@ -493,26 +606,22 @@ const createProduct = async () => {
   loading.value = true
   try {
     const response = await BASE_URL.post('products/add', {
-      createdAt,
       title: title.value,
-      price: price.value,
       category: selectedCategory.value,
       subCategory: selectedSubCategory.value,
       subSubCategory: selectedSubSubCategory.value,
-      color: color.value,
-      colorName: colorName.value,
-      material: selectedMaterial.value,
+      materials: materials.value,
+      colors: colors.value,
+      sizes: sizes.value,
       defaultImage: defaultImageUrl.value,
       brand: selectedBrand.value,
-      height: numberHeight,
-      width: numberWidth,
       description: description.value,
-      availableQuantity: newAvailableQt,
-      classificationResults
+      classificationResults,
+      madeIn: madeIn.value
     })
 
     if (response && response.status === 201) {
-      resetProductForm()
+      // resetProductForm()
       loading.value = false
       messages.value.push({
         message: response.data.message,

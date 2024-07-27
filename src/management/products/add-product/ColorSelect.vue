@@ -1,59 +1,48 @@
 <template>
-  <div>
-    <div>
-      <label class="block mb-2 font-medium text-gray-900 dark:text-white">Product color</label>
-      <div
-        class="relative w-full px-4 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white sm:text-md outline-0 flex items-center justify-center"
-        :class="props.showColors ? 'border-[#0B877F]' : 'border-gray-300'"
-        ref="container"
-        id="container"
+  <div class="characteristic-list">
+    <ul class="ul grid grid-cols-4 gap-5">
+      <li
+        class="h-10 w-12 rounded-xl"
+        :style="`background-color: ${color};`"
+        v-for="(color, index) in colors"
+        :key="index"
+      ></li>
+    </ul>
+    <div class="w-full mt-5">
+      <button
+        @click="handleColorInputClick"
+        class="w-full rounded-xl px-4 py-2.5 bg-primary text-white sm:text-md outline-0 flex items-center justify-center"
+        type="button"
       >
-        <div>
-          <button
-            class="flex items-center justify-between w-full py-2"
-            @click.prevent="toggleColors"
-          >
-            <span>{{ props.color === '' ? 'Select color' : props.color }}</span>
-            <unicon name="palette" height="16" fill="white"></unicon>
-          </button>
-        </div>
-        <div
-          v-if="props.showColors"
-          class="absolute p-2 top-12 w-full border border-gray-100 shadow rounded bg-white text-gray-700 max-h-48 overflow-y-auto"
-        >
-          <div>
-            <div
-              @click.prevent="selectColor(colorOption)"
-              class="flex items-center hover:cursor-pointer py-1 space-x-2"
-              v-for="colorOption in props.baseColors"
-              :key="colorOption.hex"
-            >
-              <span
-                :style="`background-color: ${colorOption.hex};`"
-                class="h-4 w-4 rounded-full border border-gray-200"
-              >
-              </span>
-              <span> {{ colorOption.name }} </span>
-            </div>
-          </div>
-        </div>
-      </div>
+        Add colors
+      </button>
+      <input
+        ref="colorInputRef"
+        class="opacity-0"
+        @change="emit('select-color', $event.target.value)"
+        :value="selectedColor"
+        type="color"
+        name="colorSelect"
+        id="colorSelect"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-const props = defineProps({
-  baseColors: Array,
-  showColors: Boolean,
-  color: String
-})
-const emit = defineEmits(['toggle-colors', 'select-color'])
+import { ref } from 'vue'
 
-const toggleColors = () => {
-  emit('toggle-colors')
-}
-const selectColor = (colorOption) => {
-  emit('select-color', colorOption)
+const props = defineProps({
+  colors: { type: Array, default: [] },
+  selectedColor: { type: String, default: null }
+})
+const emit = defineEmits(['select-color'])
+
+const colorInputRef = ref(null)
+
+const handleColorInputClick = () => {
+  console.log('clicked')
+  console.log('colorInputRef.value', colorInputRef.value)
+  colorInputRef.value.click()
 }
 </script>
