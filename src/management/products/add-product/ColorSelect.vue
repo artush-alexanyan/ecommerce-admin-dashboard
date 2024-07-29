@@ -1,12 +1,18 @@
 <template>
   <div class="characteristic-list">
-    <ul class="ul grid grid-cols-4 gap-5">
+    <ul class="ul grid grid-cols-2 text-white gap-5">
       <li
-        class="h-10 w-12 rounded-xl"
-        :style="`background-color: ${color};`"
+        class="px-5 py-3.5 rounded-xl text-xs flex items-center justify-center relative"
+        :style="`background-color: ${color.hex};`"
         v-for="(color, index) in colors"
         :key="index"
-      ></li>
+        @click="emit('remove-color', index)"
+      >
+        {{ color.colorName }}
+        <button class="absolute top-0 right-0">
+          <unicon name="times" fill="black"></unicon>
+        </button>
+      </li>
     </ul>
     <div class="w-full mt-5">
       <button
@@ -31,14 +37,21 @@
 
 <script setup>
 import { ref } from 'vue'
+import namer from 'color-namer'
 
 const props = defineProps({
   colors: { type: Array, default: [] },
-  selectedColor: { type: String, default: null }
+  selectedColor: { type: [Object, String], default: '#ffffff' }
 })
-const emit = defineEmits(['select-color'])
+
+const emit = defineEmits(['select-color', 'remove-color'])
 
 const colorInputRef = ref(null)
+
+const getColorName = (hex) => {
+  const names = namer(hex).ntc[0].name
+  return names
+}
 
 const handleColorInputClick = () => {
   console.log('clicked')

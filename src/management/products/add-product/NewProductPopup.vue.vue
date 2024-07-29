@@ -22,6 +22,8 @@
               <form @submit.prevent="createProduct">
                 <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 md:gap-4 gap-2">
                   <BaseInput v-bind="$attrs" :label="'Title'" :type="'text'" v-model="title" />
+                  <BaseInput v-bind="$attrs" :label="'Price'" :type="'text'" v-model="price" />
+                  <BaseInput v-bind="$attrs" :label="'Stock'" :type="'text'" v-model="stock" />
 
                   <BaseSelect
                     :items="categories"
@@ -114,15 +116,22 @@
               :colors="colors"
               :selected-color="selectedColor"
               @select-color="selectColor"
+              @remove-color="removeColor"
             />
             <hr class="my-2.5" />
             <MaterialSelect
               :materials="materials"
               :materials-data="materialsData"
               @select-item="selectMaterial"
+              @remove-material="removeMaterial"
             />
             <hr class="my-2.5" />
-            <SizeSelect :sizes="sizes" :sizes-data="sizeData" @select-item="selectSize" />
+            <SizeSelect
+              :sizes="sizes"
+              :sizes-data="sizeData"
+              @select-item="selectSize"
+              @remove-size="removeSize"
+            />
           </div>
         </div></div
     ></Transition>
@@ -143,6 +152,7 @@ import BaseSelect from './BaseSelect.vue'
 import ColorSelect from './ColorSelect.vue'
 import MaterialSelect from './MaterialSelect.vue'
 import SizeSelect from './SizeSelect.vue'
+import namer from 'color-namer'
 
 const props = defineProps({
   showNewProductPopup: Boolean
@@ -160,11 +170,8 @@ const loadingImage = ref(false)
 const messages = ref([])
 const title = ref('')
 const price = ref('')
-const height = ref('')
-const width = ref('')
 const description = ref('')
-const color = ref('')
-const hex = ref('')
+const stock = ref('')
 const colors = ref([])
 const materials = ref([])
 const sizes = ref([])
@@ -414,7 +421,7 @@ const selectedCategory = ref(null)
 const selectedSubCategory = ref(null)
 const selectedSubSubCategory = ref(null)
 const selectedBrand = ref(null)
-const selectedColor = ref(null)
+const selectedColor = ref('#ffffff')
 const madeIn = ref(null)
 
 const sendAssistanceMessage = async () => {
@@ -430,21 +437,21 @@ const sendAssistanceMessage = async () => {
   }
 }
 
-const resetProductForm = () => {
-  title.value = ''
-  description.value = ''
-  price.value = ''
-  height.value = ''
-  width.value = ''
-  color.value = ''
-  hex.value = ''
-  showColors.value = false
-  defaultImageUrl.value = null
-  selectedBrand.value = null
-  selectedCategory.value = null
-  selectedSubCategory.value = null
-  selectedSubSubCategory.value = null
-}
+// const resetProductForm = () => {
+//   title.value = ''
+//   description.value = ''
+//   price.value = ''
+//   height.value = ''
+//   width.value = ''
+//   color.value = ''
+//   hex.value = ''
+//   showColors.value = false
+//   defaultImageUrl.value = null
+//   selectedBrand.value = null
+//   selectedCategory.value = null
+//   selectedSubCategory.value = null
+//   selectedSubSubCategory.value = null
+// }
 
 const selectCategory = (item) => {
   console.log('item', item)
@@ -464,8 +471,35 @@ const selectBrand = (item) => {
   selectedBrand.value = item
 }
 
+const getColorName = (hex) => {
+  const names = namer(hex).ntc[0].name
+  return names
+}
+
 const selectColor = (item) => {
-  colors.value.push(item)
+  const colorName = getColorName(item)
+  colors.value.push({
+    colorName,
+    hex: item
+  })
+}
+
+const removeColor = (index) => {
+  if (index >= 0 && index < colors.value.length) {
+    colors.value.splice(index, 1)
+  }
+}
+
+const removeMaterial = (index) => {
+  if (index >= 0 && index < materials.value.length) {
+    materials.value.splice(index, 1)
+  }
+}
+
+const removeSize = (index) => {
+  if (index >= 0 && index < sizes.value.length) {
+    sizes.value.splice(index, 1)
+  }
 }
 
 const selectMaterial = (item) => {
@@ -583,6 +617,8 @@ const uploadNewImage = async () => {
   defaultImageUrl.value = imageUrl
 }
 const createProduct = async () => {
+  const numberPrice = Number(price.value)
+  const numberStock = Number(stock.value)
   if (colors.value.length === 0 || materials.value.length === 0 || sizes.value.length === 0) {
     messages.value.push({
       message: 'Please add all characteristics',
@@ -601,8 +637,9 @@ const createProduct = async () => {
     resetMessages()
     return
   }
-  const classificationResults = await processImage(defaultImageUrl.value)
-  console.log('classificationResults', classificationResults)
+  const classificationResults = []
+  // const classificationResults = await processImage(defaultImageUrl.value)
+  // console.log('classificationResults', classificationResults)
   loading.value = true
   try {
     const response = await BASE_URL.post('products/add', {
@@ -617,7 +654,9 @@ const createProduct = async () => {
       brand: selectedBrand.value,
       description: description.value,
       classificationResults,
-      madeIn: madeIn.value
+      madeIn: madeIn.value,
+      stock: numberStock,
+      price: numberPrice
     })
 
     if (response && response.status === 201) {

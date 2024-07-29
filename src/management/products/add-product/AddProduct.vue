@@ -17,6 +17,7 @@
       <VariantPopup
         :show-variant-popup="showVariantPopup"
         :product-id="markedProductId"
+        :product="product"
         @close-variant-popup="closeVariantPopup"
       />
       <BaseDeleteModal
@@ -65,11 +66,12 @@
                   {{ !variantsLoading ? 'Add images' : 'Loading...' }}
                 </button>
                 <button
+                  :disabled="productLoading"
                   @click="openVariantPopup(product._id)"
                   type="button"
                   class="bg-blue-600 text-white px-5 py-2.5 rounded"
                 >
-                  Add variant
+                  {{ productLoading ? 'Loading...' : 'Add variant' }}
                 </button>
               </div>
             </div>
@@ -113,7 +115,8 @@ const showVariantPopup = ref(false)
 const markedProductId = ref(null)
 const variantsLoading = ref(false)
 const variants = ref([])
-
+const productLoading = ref(false)
+const product = ref(null)
 const closeImagesPopup = () => {
   showImagesPopup.value = false
 }
@@ -136,10 +139,18 @@ const openImagesPopup = async (productId) => {
 const closeVariantPopup = () => {
   showVariantPopup.value = false
 }
-const openVariantPopup = (productId) => {
-  console.log('ProductId', productId)
-  markedProductId.value = productId
-  showVariantPopup.value = true
+const openVariantPopup = async (productId) => {
+  productLoading.value = true
+  try {
+    const response = await BASE_URL.get(`/products/getByid/${productId}`)
+    product.value = response.data.product
+    productLoading.value = false
+    markedProductId.value = productId
+    showVariantPopup.value = true
+  } catch (error) {
+    productLoading.value = false
+    alert(error.response ? error.respose.data.message : error.message)
+  }
 }
 
 const openNewProductPopup = () => {

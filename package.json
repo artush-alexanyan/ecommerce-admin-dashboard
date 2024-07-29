@@ -16,6 +16,7 @@
     "animate.css": "^4.1.1",
     "autoprefixer": "^10",
     "axios": "^1.6.8",
+    "color-namer": "^1.4.0",
     "eslint-plugin-vue": "^9.26.0",
     "pinia": "^2.1.7",
     "postcss": "^8",

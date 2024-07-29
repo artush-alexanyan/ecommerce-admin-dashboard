@@ -1,8 +1,15 @@
 <template>
   <div class="size-selection">
     <ul class="ul">
-      <li class="text-lg my-1.5" v-for="(size, index) in sizes" :key="index">
-        {{ size.title }}
+      <li
+        class="text-lg my-1.5 flex items-center justify-between"
+        v-for="(size, index) in sizes"
+        :key="index"
+      >
+        <span> {{ size.title }}</span>
+        <button @click="emit('remove-size', index)">
+          <unicon name="times" fill="black"></unicon>
+        </button>
       </li>
     </ul>
     <div class="flex flex-col w-full mt-5">
@@ -25,7 +32,7 @@
 <script setup>
 import { computed } from 'vue'
 
-const emit = defineEmits(['select-item'])
+const emit = defineEmits(['select-item', 'remove-size'])
 
 const props = defineProps({
   selectedItem: { type: [Object, String], default: null },

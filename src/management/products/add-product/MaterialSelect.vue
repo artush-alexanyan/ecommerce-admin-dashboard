@@ -1,8 +1,15 @@
 <template>
   <div class="material-selection">
     <ul class="ul">
-      <li class="text-lg my-1.5" v-for="(material, index) in materials" :key="index">
-        {{ material.title_ru }}
+      <li
+        class="text-lg my-1.5 flex items-center justify-between"
+        v-for="(material, index) in materials"
+        :key="index"
+      >
+        <span> {{ material.title_ru }}</span>
+        <button @click="emit('remove-material', index)">
+          <unicon name="times" fill="black"></unicon>
+        </button>
       </li>
     </ul>
     <div class="flex flex-col w-full mt-5">
@@ -25,7 +32,7 @@
 <script setup>
 import { computed } from 'vue'
 
-const emit = defineEmits(['select-item'])
+const emit = defineEmits(['select-item', 'remove-material'])
 
 const props = defineProps({
   selectedItem: { type: [Object, String], default: null },
