@@ -1,6 +1,6 @@
 <template>
   <div class="characteristic-list">
-    <ul class="ul grid grid-cols-2 text-white gap-5">
+    <!-- <ul class="ul grid grid-cols-2 text-white gap-5">
       <li
         class="px-5 py-3.5 rounded-xl text-xs flex items-center justify-center relative"
         :style="`background-color: ${color.hex};`"
@@ -13,14 +13,22 @@
           <unicon name="times" fill="black"></unicon>
         </button>
       </li>
-    </ul>
+    </ul> -->
+    <div v-if="selectedColor" class="selected-color">
+      <div
+        class="px-5 py-3.5 rounded-xl text-xs flex items-center justify-center relative"
+        :style="`background-color: ${selectedColor.hex};`"
+      >
+        <span class="text-white"> {{ selectedColor.colorName }}</span>
+      </div>
+    </div>
     <div class="w-full mt-5">
       <button
         @click="handleColorInputClick"
         class="w-full rounded-xl px-4 py-2.5 bg-primary text-white sm:text-md outline-0 flex items-center justify-center"
         type="button"
       >
-        Add colors
+        Select color
       </button>
       <input
         ref="colorInputRef"
@@ -40,7 +48,6 @@ import { ref } from 'vue'
 import namer from 'color-namer'
 
 const props = defineProps({
-  colors: { type: Array, default: [] },
   selectedColor: { type: [Object, String], default: '#ffffff' }
 })
 

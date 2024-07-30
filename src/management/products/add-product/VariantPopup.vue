@@ -8,7 +8,7 @@
         v-if="showVariantPopup"
         class="fixed top-0 left-0 z-30 bg-black/50 w-full h-screen flex p-5 justify-center items-center"
       >
-        <div class="bg-white p-5 rounded-[30px] w-4/6">
+        <div class="bg-white p-5 rounded-[30px] w-4/6 h-4/5">
           <div>
             <div class="flex items-center justify-between pb-5 border-b border-b-gray-200">
               <p class="text-xl font-semibold">
@@ -21,103 +21,74 @@
 
             <div class="bg-white p-5 rounded-[30px] grid md:grid-cols-3 gap-5">
               <div class="w-full md:col-span-2">
-                <div class="grid grid-cols-2 gap-5">
-                  <div class="flex flex-col">
-                    <label>Price</label>
-                    <input
-                      type="text"
-                      v-model="price"
-                      class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-2.5 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
-                    />
-                  </div>
-                  <div class="flex flex-col">
-                    <label>Available qt.</label>
-                    <input
-                      type="text"
-                      v-model="availableQuantity"
-                      class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-2.5 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
-                    />
-                  </div>
-                  <div class="flex flex-col" v-if="selectedColor">
-                    <div
-                      :style="`background-color: ${selectedColor.hex};`"
-                      class="border border-gray-200 rounded-xl py-3.5 flex items-center justify-center text-xs text-white"
+                <div class="my-5 flex items-center space-x-5">
+                  <div>
+                    <button
+                      :disabled="uploading || saving"
+                      @click="handleInputClick"
+                      type="button"
+                      class="bg-green-600 text-white px-5 py-2.5 rounded flex items-center justify-center space-x-2.5"
                     >
-                      {{ selectedColor.colorName }}
+                      <span class="whitespace-nowrap">Select image</span>
+                      <unicon name="image-plus" fill="white"></unicon>
+                    </button>
+                    <input
+                      class="hidden"
+                      type="file"
+                      name="imageInput"
+                      id="imageInput"
+                      ref="imageRef"
+                      @change="handleImageSelect"
+                    />
+                  </div>
+                  <div class="" v-if="image">
+                    <button
+                      @click="uploadImage"
+                      :disabled="uploading || saving"
+                      class="bg-blue-600 text-white px-5 py-2.5 rounded flex items-center justify-center space-x-2.5"
+                    >
+                      <span>{{ uploading ? 'Uploading..' : 'Upload' }}</span>
+                      <unicon name="cloud-upload" fill="white"></unicon>
+                    </button>
+                  </div>
+                  <button
+                    :disabled="saving"
+                    type="button"
+                    @click="addImages"
+                    class="bg-blue-600 text-white px-5 py-2.5 rounded"
+                  >
+                    {{ saving ? 'Saving...' : 'Save variant' }}
+                  </button>
+                </div>
+                <div class="ul py-5 grid grid-cols-3 gap-5">
+                  <div class="li" v-for="(imageItem, index) in images" :key="index">
+                    <div class="relative">
+                      <img :src="imageItem.url" alt="" class="h-32" />
+                      <button @click="removeImage(index)" class="absolute top-0 right-0">
+                        <unicon name="times" fill="black"></unicon>
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
               <div class="md:col-span-1 border-l border-l-gray-200 p-2.5">
-                <ColorSelect
-                  :colors="colors"
-                  :selected-color="selectedColor"
-                  @select-color="selectColor"
-                  @remove-color="removeColor"
-                />
+                <ColorSelect :selected-color="selectedColor" @select-color="selectColor" />
                 <hr class="my-2.5" />
                 <MaterialSelect
-                  :materials="materials"
+                  :selected-item="selectedMaterial"
                   :materials-data="materialsData"
                   @select-item="selectMaterial"
-                  @remove-material="removeMaterial"
                 />
                 <hr class="my-2.5" />
                 <SizeSelect
+                  v-model:currentPrice="currentPrice"
+                  v-model:currentStock="currentStock"
                   :sizes="sizes"
                   :sizes-data="sizeData"
                   @select-item="selectSize"
                   @remove-size="removeSize"
+                  @save-size="saveStockAndPrice"
                 />
-              </div>
-            </div>
-            <div class="my-5 flex items-center space-x-5">
-              <div>
-                <button
-                  :disabled="uploading || saving"
-                  @click="handleInputClick"
-                  type="button"
-                  class="bg-green-600 text-white px-5 py-2.5 rounded flex items-center justify-center space-x-2.5"
-                >
-                  <span class="whitespace-nowrap">Select image</span>
-                  <unicon name="image-plus" fill="white"></unicon>
-                </button>
-                <input
-                  class="hidden"
-                  type="file"
-                  name="imageInput"
-                  id="imageInput"
-                  ref="imageRef"
-                  @change="handleImageSelect"
-                />
-              </div>
-              <div class="" v-if="image">
-                <button
-                  @click="uploadImage"
-                  :disabled="uploading || saving"
-                  class="bg-blue-600 text-white px-5 py-2.5 rounded flex items-center justify-center space-x-2.5"
-                >
-                  <span>{{ uploading ? 'Uploading..' : 'Upload' }}</span>
-                  <unicon name="cloud-upload" fill="white"></unicon>
-                </button>
-              </div>
-              <button
-                :disabled="saving"
-                type="button"
-                @click="addImages"
-                class="bg-blue-600 text-white px-5 py-2.5 rounded"
-              >
-                {{ saving ? 'Saving...' : 'Save variant' }}
-              </button>
-            </div>
-            <div class="ul py-5 grid grid-cols-3 gap-5">
-              <div class="li" v-for="(imageItem, index) in images" :key="index">
-                <div class="relative">
-                  <img :src="imageItem.url" alt="" class="h-32" />
-                  <button @click="removeImage(index)" class="absolute top-0 right-0">
-                    <unicon name="times" fill="black"></unicon>
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -149,15 +120,14 @@ const images = ref([])
 const image = ref(null)
 const saving = ref(false)
 const imageRef = ref(null)
-const price = ref('')
-const availableQuantity = ref('')
 const selectedMaterial = ref(null)
 const defaultColor = ref('#fffff')
 const selectedColor = ref(null)
 const selectedSize = ref(null)
 const materials = ref([])
 const sizes = ref([])
-const colors = ref([])
+const currentPrice = ref(0)
+const currentStock = ref(0)
 
 const materialsData = ref([
   { id: 1, title_ru: 'Дерево', title_en: 'Wood' },
@@ -395,9 +365,7 @@ const sizeData = ref([
 ])
 
 const selectMaterial = (item) => {
-  // console.log(item)
-  // selectedMaterial.value = item
-  materials.value.push(item)
+  selectedMaterial.value = item
 }
 
 const getColorName = (hex) => {
@@ -416,19 +384,12 @@ const selectColor = (item) => {
 const selectSize = (item) => {
   console.log(item)
   selectedSize.value = item
-  sizes.value.push(item)
+  sizes.value.push({ size: item })
 }
 
-const removeColor = (index) => {
-  if (index >= 0 && index < colors.value.length) {
-    colors.value.splice(index, 1)
-  }
-}
-
-const removeMaterial = (index) => {
-  if (index >= 0 && index < materials.value.length) {
-    materials.value.splice(index, 1)
-  }
+const saveStockAndPrice = (index) => {
+  sizes.value[index].stock = Number(currentStock.value)
+  sizes.value[index].price = Number(currentPrice.value)
 }
 
 const removeSize = (index) => {
@@ -464,18 +425,12 @@ const removeImage = (index) => {
 const addImages = async () => {
   console.log('props.productId', props.productId)
   saving.value = true
-  const stock = Number(availableQuantity.value)
-  const numberPrice = Number(price.value)
-  console.log('stock', stock)
-  console.log('numberPrice', numberPrice)
   try {
     const response = await BASE_URL.post(`/products/${props.productId}/variants/add`, {
       images: images.value,
       sizes: sizes.value,
-      price: numberPrice,
-      stock,
       color: selectedColor.value,
-      materials: materials.value
+      material: selectedMaterial.value
     })
     console.log(response.data)
     selectedColor.value = null

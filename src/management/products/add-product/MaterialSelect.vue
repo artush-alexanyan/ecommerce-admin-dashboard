@@ -1,6 +1,6 @@
 <template>
   <div class="material-selection">
-    <ul class="ul">
+    <!-- <ul class="ul">
       <li
         class="text-lg my-1.5 flex items-center justify-between"
         v-for="(material, index) in materials"
@@ -11,9 +11,9 @@
           <unicon name="times" fill="black"></unicon>
         </button>
       </li>
-    </ul>
+    </ul> -->
     <div class="flex flex-col w-full mt-5">
-      <label class="mb-2.5">Select materials</label>
+      <label class="mb-2.5">Select material</label>
       <select
         :value="selectedValue"
         @change="handleChange"
@@ -37,7 +37,7 @@ const emit = defineEmits(['select-item', 'remove-material'])
 const props = defineProps({
   selectedItem: { type: [Object, String], default: null },
   label: { type: String, default: 'category' },
-  materials: { type: Array, default: () => [] },
+  // materials: { type: Array, default: () => [] },
   materialsData: { type: Array, default: () => [] }
 })
 

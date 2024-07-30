@@ -8,7 +8,7 @@
         v-if="showNewProductPopup"
         class="fixed top-0 left-0 z-30 bg-black/50 w-full h-screen flex p-5 justify-center"
       >
-        <div class="bg-white p-5 rounded-[30px] w-3/4 grid md:grid-cols-3 gap-5">
+        <div class="bg-white p-5 rounded-[30px] w-4/5 grid md:grid-cols-3 gap-5">
           <div class="md:col-span-2">
             <BaseAlert :messages="messages || uploadMessages" />
             <div class="flex items-center justify-between pb-5 border-b border-b-gray-200">
@@ -22,8 +22,6 @@
               <form @submit.prevent="createProduct">
                 <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 md:gap-4 gap-2">
                   <BaseInput v-bind="$attrs" :label="'Title'" :type="'text'" v-model="title" />
-                  <BaseInput v-bind="$attrs" :label="'Price'" :type="'text'" v-model="price" />
-                  <BaseInput v-bind="$attrs" :label="'Stock'" :type="'text'" v-model="stock" />
 
                   <BaseSelect
                     :items="categories"
@@ -112,25 +110,22 @@
             </div>
           </div>
           <div class="border-l border-l-gray-200 p-2.5">
-            <ColorSelect
-              :colors="colors"
-              :selected-color="selectedColor"
-              @select-color="selectColor"
-              @remove-color="removeColor"
-            />
+            <ColorSelect :selected-color="selectedColor" @select-color="selectColor" />
             <hr class="my-2.5" />
             <MaterialSelect
-              :materials="materials"
+              :selected-item="selectedMaterial"
               :materials-data="materialsData"
               @select-item="selectMaterial"
-              @remove-material="removeMaterial"
             />
             <hr class="my-2.5" />
             <SizeSelect
+              v-model:currentPrice="currentPrice"
+              v-model:currentStock="currentStock"
               :sizes="sizes"
               :sizes-data="sizeData"
               @select-item="selectSize"
               @remove-size="removeSize"
+              @save-size="saveStockAndPrice"
             />
           </div>
         </div></div
@@ -172,7 +167,6 @@ const title = ref('')
 const price = ref('')
 const description = ref('')
 const stock = ref('')
-const colors = ref([])
 const materials = ref([])
 const sizes = ref([])
 const showColors = ref(false)
@@ -422,7 +416,11 @@ const selectedSubCategory = ref(null)
 const selectedSubSubCategory = ref(null)
 const selectedBrand = ref(null)
 const selectedColor = ref('#ffffff')
+const selectedMaterial = ref(null)
+const currentStock = ref(0)
+const currentPrice = ref(0)
 const madeIn = ref(null)
+const productSizes = ref([])
 
 const sendAssistanceMessage = async () => {
   generating.value = true
@@ -478,37 +476,43 @@ const getColorName = (hex) => {
 
 const selectColor = (item) => {
   const colorName = getColorName(item)
-  colors.value.push({
+  selectedColor.value = {
     colorName,
     hex: item
-  })
-}
-
-const removeColor = (index) => {
-  if (index >= 0 && index < colors.value.length) {
-    colors.value.splice(index, 1)
   }
 }
 
-const removeMaterial = (index) => {
-  if (index >= 0 && index < materials.value.length) {
-    materials.value.splice(index, 1)
-  }
-}
+// const removeColor = (index) => {
+//   if (index >= 0 && index < colors.value.length) {
+//     colors.value.splice(index, 1)
+//   }
+// }
 
 const removeSize = (index) => {
   if (index >= 0 && index < sizes.value.length) {
+    sizes.value.splice(index, 1)
+  }
+  if (index >= 0 && index < productSizes.value.length) {
     sizes.value.splice(index, 1)
   }
 }
 
 const selectMaterial = (item) => {
   console.log('item', item)
+  selectedMaterial.value = item
   materials.value.push(item)
 }
 
 const selectSize = (item) => {
-  sizes.value.push(item)
+  sizes.value.push({
+    size: item
+  })
+  productSizes.value.push(item)
+}
+
+const saveStockAndPrice = (index) => {
+  sizes.value[index].price = Number(currentPrice.value)
+  sizes.value[index].stock = Number(currentStock.value)
 }
 
 const selectCountry = (item) => {
@@ -617,9 +621,12 @@ const uploadNewImage = async () => {
   defaultImageUrl.value = imageUrl
 }
 const createProduct = async () => {
-  const numberPrice = Number(price.value)
-  const numberStock = Number(stock.value)
-  if (colors.value.length === 0 || materials.value.length === 0 || sizes.value.length === 0) {
+  if (
+    !selectedColor.value ||
+    !selectedMaterial.value ||
+    sizes.value.length === 0 ||
+    productSizes.value.length === 0
+  ) {
     messages.value.push({
       message: 'Please add all characteristics',
       type: 'Warning'
@@ -647,16 +654,15 @@ const createProduct = async () => {
       category: selectedCategory.value,
       subCategory: selectedSubCategory.value,
       subSubCategory: selectedSubSubCategory.value,
-      materials: materials.value,
-      colors: colors.value,
+      material: selectedMaterial.value,
+      color: selectedColor.value,
       sizes: sizes.value,
+      productSizes: productSizes.value,
       defaultImage: defaultImageUrl.value,
       brand: selectedBrand.value,
       description: description.value,
       classificationResults,
-      madeIn: madeIn.value,
-      stock: numberStock,
-      price: numberPrice
+      madeIn: madeIn.value
     })
 
     if (response && response.status === 201) {
