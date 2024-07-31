@@ -14,18 +14,11 @@
         </button>
       </li>
     </ul> -->
-    <div v-if="selectedColor" class="selected-color">
-      <div
-        class="px-5 py-3.5 rounded-xl text-xs flex items-center justify-center relative"
-        :style="`background-color: ${selectedColor.hex};`"
-      >
-        <span class="text-white"> {{ selectedColor.colorName }}</span>
-      </div>
-    </div>
-    <div class="w-full mt-5">
+
+    <div class="w-full">
       <button
         @click="handleColorInputClick"
-        class="w-full rounded-xl px-4 py-2.5 bg-primary text-white sm:text-md outline-0 flex items-center justify-center"
+        class="w-full rounded-xl px-4 py-3.5 bg-primary text-white sm:text-md outline-0 flex items-center justify-center"
         type="button"
       >
         Select color
@@ -39,6 +32,14 @@
         name="colorSelect"
         id="colorSelect"
       />
+    </div>
+    <div v-if="selectedColor" class="selected-color">
+      <div
+        class="px-5 py-3.5 rounded-xl text-xs flex items-center justify-center relative"
+        :style="`background-color: ${selectedColor.hex};`"
+      >
+        <span class="text-white"> {{ selectedColor.colorName }}</span>
+      </div>
     </div>
   </div>
 </template>

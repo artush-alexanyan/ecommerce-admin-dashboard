@@ -6,10 +6,10 @@
     >
       <div
         v-if="showNewProductPopup"
-        class="fixed top-0 left-0 z-30 bg-black/50 w-full h-screen flex p-5 justify-center"
+        class="fixed top-0 left-0 z-30 bg-black/50 w-full h-screen flex justify-center"
       >
-        <div class="bg-white p-5 rounded-[30px] w-4/5 grid md:grid-cols-3 gap-5">
-          <div class="md:col-span-2">
+        <div class="bg-white p-5 w-full grid md:grid-cols-10 gap-5">
+          <div class="md:col-span-4">
             <BaseAlert :messages="messages || uploadMessages" />
             <div class="flex items-center justify-between pb-5 border-b border-b-gray-200">
               <p class="text-xl font-semibold">Add a new product</p>
@@ -109,7 +109,7 @@
               </div>
             </div>
           </div>
-          <div class="border-l border-l-gray-200 p-2.5">
+          <div class="border-l border-l-gray-200 p-2.5 md:col-span-3">
             <ColorSelect :selected-color="selectedColor" @select-color="selectColor" />
             <hr class="my-2.5" />
             <MaterialSelect
@@ -126,6 +126,21 @@
               @select-item="selectSize"
               @remove-size="removeSize"
               @save-size="saveStockAndPrice"
+            />
+          </div>
+          <div
+            class="border-l border-l-gray-200 p-2.5 md:col-span-3 h-screen overflow-y-auto pb-10"
+          >
+            <CharacteristicList
+              v-model:characterKey="characterKey"
+              v-model:characterValue="characterValue"
+              :show-characteristics="showCharacteristics"
+              :characteristics="characteristics"
+              :character-key="characterKey"
+              :character-value="characterValue"
+              @toggle-characteristics="toogleCharacteristics"
+              @add-caracteristic="addCaracteristic"
+              @remove-characteristic="removeCharacteristic"
             />
           </div>
         </div></div
@@ -148,6 +163,7 @@ import ColorSelect from './ColorSelect.vue'
 import MaterialSelect from './MaterialSelect.vue'
 import SizeSelect from './SizeSelect.vue'
 import namer from 'color-namer'
+import CharacteristicList from '../CharacteristicList.vue'
 
 const props = defineProps({
   showNewProductPopup: Boolean
@@ -421,6 +437,29 @@ const currentStock = ref(0)
 const currentPrice = ref(0)
 const madeIn = ref(null)
 const productSizes = ref([])
+const characteristics = ref([])
+const showCharacteristics = ref(false)
+
+const characterKey = ref('')
+const characterValue = ref('')
+
+const addCaracteristic = () => {
+  characteristics.value.push({
+    title: characterKey.value,
+    description: characterValue.value
+  })
+  showCharacteristics.value = false
+}
+
+const removeCharacteristic = (index) => {
+  if (index >= 0 && index < characteristics.value.length) {
+    characteristics.value.splice(index, 1)
+  }
+}
+
+const toogleCharacteristics = () => {
+  showCharacteristics.value = !showCharacteristics.value
+}
 
 const sendAssistanceMessage = async () => {
   generating.value = true
@@ -621,20 +660,6 @@ const uploadNewImage = async () => {
   defaultImageUrl.value = imageUrl
 }
 const createProduct = async () => {
-  if (
-    !selectedColor.value ||
-    !selectedMaterial.value ||
-    sizes.value.length === 0 ||
-    productSizes.value.length === 0
-  ) {
-    messages.value.push({
-      message: 'Please add all characteristics',
-      type: 'Warning'
-    })
-    loading.value = false
-    resetMessages()
-    return
-  }
   if (!image.value) {
     messages.value.push({
       message: 'Please select image',
@@ -662,7 +687,8 @@ const createProduct = async () => {
       brand: selectedBrand.value,
       description: description.value,
       classificationResults,
-      madeIn: madeIn.value
+      madeIn: madeIn.value,
+      characteristics: characteristics.value
     })
 
     if (response && response.status === 201) {
