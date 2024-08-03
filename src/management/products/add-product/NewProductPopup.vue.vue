@@ -22,6 +22,18 @@
               <form @submit.prevent="createProduct">
                 <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 md:gap-4 gap-2">
                   <BaseInput v-bind="$attrs" :label="'Title'" :type="'text'" v-model="title" />
+                  <BaseInput
+                    v-bind="$attrs"
+                    :label="'Default price'"
+                    :type="'number'"
+                    v-model="defaultPrice"
+                  />
+                  <BaseInput
+                    v-bind="$attrs"
+                    :label="'Default stock'"
+                    :type="'number'"
+                    v-model="defaultStock"
+                  />
 
                   <BaseSelect
                     :items="categories"
@@ -63,7 +75,7 @@
                     <textarea
                       v-model="description"
                       placeholder="Description"
-                      class="w-full p-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
+                      class="w-full p-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal rounded-xl mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
                       name=""
                       id=""
                       cols="30"
@@ -77,7 +89,7 @@
                     placeholder="Set rules to generate description"
                     v-model="gptQuery"
                     type="text"
-                    class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal leading-7 rounded-xl px-2.5 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
+                    class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal rounded-xl px-2.5 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
                   />
                   <button
                     class="bg-blue-600 text-white px-5 py-3 rounded-xl"
@@ -110,23 +122,56 @@
             </div>
           </div>
           <div class="border-l border-l-gray-200 p-2.5 md:col-span-3">
-            <ColorSelect :selected-color="selectedColor" @select-color="selectColor" />
-            <hr class="my-2.5" />
-            <MaterialSelect
-              :selected-item="selectedMaterial"
-              :materials-data="materialsData"
-              @select-item="selectMaterial"
+            <BaseSelect
+              :items="attributesList"
+              :label="'attributes'"
+              :selected-item="selectedAttribute"
+              @select-item="selectAttribute"
+              class="mb-5"
             />
             <hr class="my-2.5" />
-            <SizeSelect
-              v-model:currentPrice="currentPrice"
-              v-model:currentStock="currentStock"
-              :sizes="sizes"
-              :sizes-data="sizeData"
-              @select-item="selectSize"
-              @remove-size="removeSize"
-              @save-size="saveStockAndPrice"
+
+            <ColorSelect
+              v-if="selectedAttribute === 'Color'"
+              :selected-color="selectedColor"
+              @select-color="selectColor"
+              @add-attribute-option="addAttributeOption"
             />
+            <div class="flex flex-col" v-if="selectedAttribute && selectedAttribute !== 'Color'">
+              <label for="material" class="enter-color">Enter {{ selectedAttribute }}</label>
+              <div class="grid grid-cols-3 gap-2.5">
+                <div class="">
+                  <input
+                    v-model="selectedOption.label"
+                    :placeholder="`${selectedAttribute} label`"
+                    class="w-full py-2.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal rounded-xl px-2.5 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
+                    type="text"
+                  />
+                </div>
+                <div class="">
+                  <input
+                    v-model="selectedOption.attributeValue"
+                    :placeholder="`${selectedAttribute} value`"
+                    class="w-full py-2.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal rounded-xl px-2.5 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
+                    type="text"
+                  />
+                </div>
+                <div class="">
+                  <button
+                    class="bg-blue-600 text-white px-2.5 py-3.5 w-full rounded-xl"
+                    @click="addAttributeOption"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+            <h2>Attributes and Options</h2>
+            <ul>
+              <li v-for="(options, attribute) in attributes" :key="attribute">
+                <strong>{{ attribute }}:</strong> {{ options }}
+              </li>
+            </ul>
           </div>
           <div
             class="border-l border-l-gray-200 p-2.5 md:col-span-3 h-screen overflow-y-auto pb-10"
@@ -149,7 +194,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useUploadImageStore } from '@/stores/upload-image/upload-image'
 import BASE_URL from '@/backand/api'
 import BaseAlert from '@/base/BaseAlert.vue'
@@ -180,12 +225,10 @@ const loading = ref(false)
 const loadingImage = ref(false)
 const messages = ref([])
 const title = ref('')
-const price = ref('')
+const defaultPrice = ref('')
+const defaultStock = ref('')
 const description = ref('')
-const stock = ref('')
-const materials = ref([])
 const sizes = ref([])
-const showColors = ref(false)
 const image = ref(null)
 const defaultImageUrl = ref(null)
 const materialsData = ref([
@@ -439,9 +482,44 @@ const madeIn = ref(null)
 const productSizes = ref([])
 const characteristics = ref([])
 const showCharacteristics = ref(false)
-
+const attributes = ref([])
+const selectedAttribute = ref(null)
+const attributesList = ref(['Color', 'Material', 'Size'])
 const characterKey = ref('')
 const characterValue = ref('')
+
+// Unified structure for a new option based on attribute type
+const selectedOption = reactive({
+  label: '', // e.g., color name, material name, size label
+  attributeValue: '' // e.g., hex code for color, material type, size dimensions
+})
+
+const addAttributeOption = () => {
+  // Ensure a valid attribute is selected
+  if (selectedAttribute.value) {
+    // Find or create the attribute entry in the attributes array
+    let attribute = attributes.value.find((attr) => attr.name === selectedAttribute.value)
+
+    if (!attribute) {
+      attribute = {
+        name: selectedAttribute.value,
+        options: []
+      }
+      attributes.value.push(attribute)
+    }
+
+    const { label, attributeValue } = selectedOption
+    console.log('label, attributeValue', label, attributeValue)
+    // Check that label and attributeValue are not empty
+    if (label.trim() !== '' && attributeValue.trim() !== '') {
+      // Add the option as an object
+      attribute.options.push({ label: label.trim(), attributeValue: attributeValue.trim() })
+      // Reset selected option
+      selectedOption.label = ''
+      selectedOption.attributeValue = ''
+    }
+  }
+}
 
 const addCaracteristic = () => {
   characteristics.value.push({
@@ -489,7 +567,10 @@ const sendAssistanceMessage = async () => {
 //   selectedSubCategory.value = null
 //   selectedSubSubCategory.value = null
 // }
-
+const selectAttribute = (attribute) => {
+  console.log('attribute', attribute)
+  selectedAttribute.value = attribute
+}
 const selectCategory = (item) => {
   console.log('item', item)
   selectedCategory.value = item
@@ -519,13 +600,15 @@ const selectColor = (item) => {
     colorName,
     hex: item
   }
+  selectedOption.label = colorName
+  selectedOption.attributeValue = item
 }
 
-// const removeColor = (index) => {
-//   if (index >= 0 && index < colors.value.length) {
-//     colors.value.splice(index, 1)
-//   }
-// }
+const removeColor = (index) => {
+  if (index >= 0 && index < colors.value.length) {
+    colors.value.splice(index, 1)
+  }
+}
 
 const removeSize = (index) => {
   if (index >= 0 && index < sizes.value.length) {
@@ -679,16 +762,15 @@ const createProduct = async () => {
       category: selectedCategory.value,
       subCategory: selectedSubCategory.value,
       subSubCategory: selectedSubSubCategory.value,
-      material: selectedMaterial.value,
-      color: selectedColor.value,
-      sizes: sizes.value,
-      productSizes: productSizes.value,
       defaultImage: defaultImageUrl.value,
       brand: selectedBrand.value,
       description: description.value,
       classificationResults,
       madeIn: madeIn.value,
-      characteristics: characteristics.value
+      attributes: attributes.value,
+      characteristics: characteristics.value,
+      defaultPrice: Number(defaultPrice.value),
+      defaultStock: Number(defaultStock.value)
     })
 
     if (response && response.status === 201) {
@@ -713,11 +795,6 @@ const createProduct = async () => {
   }
 }
 
-const handleClickOutside = (event) => {
-  if (containerRef.value && !containerRef.value.contains(event.target)) {
-    showColors.value = false
-  }
-}
 const getBrands = async () => {
   brandLoading.value = true
   try {
@@ -739,12 +816,6 @@ const getBrands = async () => {
 onMounted(async () => {
   await categoryStore.fetchCategories()
   await getBrands()
-  containerRef.value = document.getElementById('container')
-  document.addEventListener('click', handleClickOutside)
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 

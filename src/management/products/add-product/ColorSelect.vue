@@ -1,6 +1,6 @@
 <template>
   <div class="characteristic-list">
-    <!-- <ul class="ul grid grid-cols-2 text-white gap-5">
+    <!-- <ul class="ul grid grid-cols-2 text-white gap-5 mb-5">
       <li
         class="px-5 py-3.5 rounded-xl text-xs flex items-center justify-center relative"
         :style="`background-color: ${color.hex};`"
@@ -33,12 +33,18 @@
         id="colorSelect"
       />
     </div>
-    <div v-if="selectedColor" class="selected-color">
-      <div
-        class="px-5 py-3.5 rounded-xl text-xs flex items-center justify-center relative"
-        :style="`background-color: ${selectedColor.hex};`"
-      >
-        <span class="text-white"> {{ selectedColor.colorName }}</span>
+    <div class="grid grid-cols-4 my-2.5" v-if="selectedColor">
+      <span :style="`color: ${selectedColor.hex};`" class="col-span-2">{{
+        selectedColor.colorName
+      }}</span>
+      <span class="col-span-1">{{ selectedColor.hex }}</span>
+      <div class="col-span-1">
+        <button
+          @click="emit('add-attribute-option')"
+          class="bg-blue-600 text-white py-1 px-2 rounded"
+        >
+          Add
+        </button>
       </div>
     </div>
   </div>
@@ -50,9 +56,10 @@ import namer from 'color-namer'
 
 const props = defineProps({
   selectedColor: { type: [Object, String], default: '#ffffff' }
+  // colors: Array
 })
 
-const emit = defineEmits(['select-color', 'remove-color'])
+const emit = defineEmits(['select-color', 'remove-color', 'add-attribute-option'])
 
 const colorInputRef = ref(null)
 
