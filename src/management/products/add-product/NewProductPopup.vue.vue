@@ -604,39 +604,6 @@ const selectColor = (item) => {
   selectedOption.attributeValue = item
 }
 
-const removeColor = (index) => {
-  if (index >= 0 && index < colors.value.length) {
-    colors.value.splice(index, 1)
-  }
-}
-
-const removeSize = (index) => {
-  if (index >= 0 && index < sizes.value.length) {
-    sizes.value.splice(index, 1)
-  }
-  if (index >= 0 && index < productSizes.value.length) {
-    sizes.value.splice(index, 1)
-  }
-}
-
-const selectMaterial = (item) => {
-  console.log('item', item)
-  selectedMaterial.value = item
-  materials.value.push(item)
-}
-
-const selectSize = (item) => {
-  sizes.value.push({
-    size: item
-  })
-  productSizes.value.push(item)
-}
-
-const saveStockAndPrice = (index) => {
-  sizes.value[index].price = Number(currentPrice.value)
-  sizes.value[index].stock = Number(currentStock.value)
-}
-
 const selectCountry = (item) => {
   madeIn.value = item
 }

@@ -9,7 +9,7 @@
       id="item"
     >
       <option v-for="(item, index) in items" :key="index" :value="JSON.stringify(item)">
-        {{ item.title_ru || item.title || item || item.colorName }}
+        {{ item.label || item.title_ru || item.title || item || item.colorName }}
       </option>
     </select>
   </div>

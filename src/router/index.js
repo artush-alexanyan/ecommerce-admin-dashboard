@@ -24,6 +24,11 @@ const router = createRouter({
           component: () => import('../management/products/ProductsRoot.vue')
         },
         {
+          path: 'variants/:id',
+          name: 'ProductVariants',
+          component: () => import('../management/products/variants/ProductVariants.vue')
+        },
+        {
           path: 'categories',
           name: 'AdminCategories',
           component: () => import('../management/categories/AdminCategories.vue')
