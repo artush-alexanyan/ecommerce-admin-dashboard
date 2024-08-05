@@ -42,6 +42,8 @@
                       <span class="font-semibold">Images: {{ variant.images.length }}</span> <br />
                       <span class="font-semibold">Stock: {{ variant.stock }}</span
                       ><br />
+                      <span class="font-semibold">Price: {{ variant.price }}</span
+                      ><br />
                       <button @click="openImagesPopup(variant._id)" class="text-green-600">
                         Add image
                       </button>

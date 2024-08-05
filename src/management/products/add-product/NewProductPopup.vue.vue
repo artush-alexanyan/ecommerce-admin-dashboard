@@ -6,190 +6,227 @@
     >
       <div
         v-if="showNewProductPopup"
-        class="fixed top-0 left-0 z-30 bg-black/50 w-full h-screen flex justify-center"
+        class="fixed top-0 left-0 z-30 bg-white w-full md:h-screen flex justify-center overflow-y-auto"
       >
-        <div class="bg-white p-5 w-full grid md:grid-cols-10 gap-5">
-          <div class="md:col-span-4">
-            <BaseAlert :messages="messages || uploadMessages" />
+        <div :class="isMultiVariant ? 'w-full' : 'max-w-5xl'">
+          <div class="bg-white p-5">
             <div class="flex items-center justify-between pb-5 border-b border-b-gray-200">
-              <p class="text-xl font-semibold">Add a new product</p>
+              <div class="flex items-center space-x-5">
+                <p class="text-xl font-semibold">Add a new product</p>
+                <div class="product-type-switch flex items-center space-x-3">
+                  <div
+                    @click="toggleMultiVariant"
+                    class="h-8 w-12 rounded-full border-2 cursor-pointer flex items-center"
+                    :class="
+                      isMultiVariant
+                        ? 'justify-end border-purple-500'
+                        : 'justify-start border-gray-300'
+                    "
+                  >
+                    <div
+                      :class="isMultiVariant ? 'bg-purple-500' : 'bg-gray-300'"
+                      class="rounded-full h-6 w-6 border border-gray-300 m-1"
+                    ></div>
+                  </div>
+                  <p class="text-sm">
+                    {{ isMultiVariant ? 'Multivariant product' : 'Regular product' }}
+                  </p>
+                </div>
+              </div>
               <button type="button" @click="emit('close-new-product-popup')">
                 <unicon name="times" fill="black"></unicon>
               </button>
             </div>
+            <div class="grid md:grid-cols-10 gap-5">
+              <div :class="isMultiVariant ? 'md:col-span-4' : 'md:col-span-5'">
+                <BaseAlert :messages="messages || uploadMessages" />
 
-            <div class="mt-5 text-sm">
-              <form @submit.prevent="createProduct">
-                <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 md:gap-4 gap-2">
-                  <BaseInput v-bind="$attrs" :label="'Title'" :type="'text'" v-model="title" />
-                  <BaseInput
-                    v-bind="$attrs"
-                    :label="'Default price'"
-                    :type="'number'"
-                    v-model="defaultPrice"
-                  />
-                  <BaseInput
-                    v-bind="$attrs"
-                    :label="'Default stock'"
-                    :type="'number'"
-                    v-model="defaultStock"
-                  />
+                <div class="mt-5 text-sm">
+                  <form @submit.prevent="createProduct">
+                    <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 md:gap-4 gap-2">
+                      <BaseInput v-bind="$attrs" :label="'Title'" :type="'text'" v-model="title" />
+                      <BaseInput
+                        v-bind="$attrs"
+                        :label="'Default price'"
+                        :type="'number'"
+                        v-model="defaultPrice"
+                      />
+                      <BaseInput
+                        v-bind="$attrs"
+                        :label="'Default stock'"
+                        :type="'number'"
+                        v-model="defaultStock"
+                      />
 
-                  <BaseSelect
-                    :items="categories"
-                    :label="'category'"
-                    :selected-item="selectedCategory"
-                    @select-item="selectCategory"
-                  />
+                      <BaseSelect
+                        :items="categories"
+                        :label="'category'"
+                        :selected-item="selectedCategory"
+                        @select-item="selectCategory"
+                      />
 
-                  <BaseSelect
-                    :items="subCategories"
-                    :label="'subcategory'"
-                    :selected-item="selectedSubCategory"
-                    @select-item="selectSubCategory"
-                  />
+                      <BaseSelect
+                        :items="subCategories"
+                        :label="'subcategory'"
+                        :selected-item="selectedSubCategory"
+                        @select-item="selectSubCategory"
+                      />
 
-                  <BaseSelect
-                    :items="subSubCategories"
-                    :label="'sub-subcategory'"
-                    :selected-item="selectedSubSubCategory"
-                    @select-item="selectSubSubCategory"
-                  />
+                      <BaseSelect
+                        :items="subSubCategories"
+                        :label="'sub-subcategory'"
+                        :selected-item="selectedSubSubCategory"
+                        @select-item="selectSubSubCategory"
+                      />
 
-                  <BaseSelect
-                    :items="brands"
-                    :label="'brand'"
-                    :selected-item="selectedBrand"
-                    @select-item="selectBrand"
-                  />
+                      <BaseSelect
+                        :items="brands"
+                        :label="'brand'"
+                        :selected-item="selectedBrand"
+                        @select-item="selectBrand"
+                      />
 
-                  <BaseSelect
-                    :items="countryData"
-                    :label="'manufacturer'"
-                    :selected-item="madeIn"
-                    @select-item="selectCountry"
-                  />
-                </div>
-                <div class="flex flex-col items-left">
-                  <label>
-                    <textarea
-                      v-model="description"
-                      placeholder="Description"
-                      class="w-full p-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal rounded-xl mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
-                      name=""
-                      id=""
-                      cols="30"
-                      rows="4"
-                    ></textarea>
-                  </label>
-                </div>
-                <div class="flex items-center justify-between space-x-2">
-                  <input
-                    :disabled="generating"
-                    placeholder="Set rules to generate description"
-                    v-model="gptQuery"
-                    type="text"
-                    class="w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal rounded-xl px-2.5 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
-                  />
-                  <button
-                    class="bg-blue-600 text-white px-5 py-3 rounded-xl"
-                    :disabled="generating"
-                    @click="sendAssistanceMessage"
-                    type="button"
+                      <BaseSelect
+                        :items="countryData"
+                        :label="'manufacturer'"
+                        :selected-item="madeIn"
+                        @select-item="selectCountry"
+                      />
+                    </div>
+                    <div class="flex flex-col items-left">
+                      <label>
+                        <textarea
+                          v-model="description"
+                          placeholder="Description"
+                          class="w-full p-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal rounded-xl mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
+                          name=""
+                          id=""
+                          cols="30"
+                          rows="4"
+                        ></textarea>
+                      </label>
+                    </div>
+                    <div class="flex items-center justify-between space-x-2">
+                      <input
+                        :disabled="generating"
+                        placeholder="Set rules to generate description"
+                        v-model="gptQuery"
+                        type="text"
+                        class="text-xs w-full py-2.5 mt-1.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base font-normal rounded-xl px-2.5 mb-1 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
+                      />
+                      <button
+                        class="bg-blue-600 text-white px-5 py-3 rounded-xl"
+                        :disabled="generating"
+                        @click="sendAssistanceMessage"
+                        type="button"
+                      >
+                        {{ generating ? 'Sending' : 'Send' }}
+                      </button>
+                    </div>
+                    <div class="grid md:grid-cols-2 md:gap-4 gap-2 mt-10">
+                      <SelectImage
+                        :image="image"
+                        :loading="loading"
+                        :uploading="uploading"
+                        @handle-file-selection="handleFileSelection"
+                        @upload-image="uploadNewImage"
+                      />
+                      <SubmitButton
+                        :loading="loading"
+                        :uploading="loadingImage"
+                        :btnText="btnText"
+                      />
+                    </div>
+                  </form>
+                  <div
+                    class="uploaded-images my-5 flex flex-col items-center"
+                    v-if="defaultImageUrl"
                   >
-                    {{ generating ? 'Sending' : 'Send' }}
-                  </button>
+                    <p class="font-semibold mg-2.5 text-sm">Default image</p>
+                    <img
+                      class="object-contain rounded h-20"
+                      :src="defaultImageUrl"
+                      alt="uploaded-image"
+                    />
+                  </div>
                 </div>
-                <div class="grid md:grid-cols-2 md:gap-4 gap-2 mt-10">
-                  <SelectImage
-                    :image="image"
-                    :loading="loading"
-                    :uploading="uploading"
-                    @handle-file-selection="handleFileSelection"
-                    @upload-image="uploadNewImage"
-                  />
-                  <SubmitButton :loading="loading" :uploading="loadingImage" :btnText="btnText" />
-                </div>
-              </form>
-              <div class="uploaded-images my-5 flex flex-col items-center" v-if="defaultImageUrl">
-                <p class="font-semibold mg-2.5 text-sm">Default image</p>
-                <img
-                  class="object-contain rounded h-20"
-                  :src="defaultImageUrl"
-                  alt="uploaded-image"
+              </div>
+              <div
+                class="border-l border-l-gray-200 p-2.5 h-screen overflow-y-auto pb-10"
+                :class="isMultiVariant ? 'md:col-span-3' : 'md:col-span-5'"
+              >
+                <CharacteristicList
+                  v-model:characterKey="characterKey"
+                  v-model:characterValue="characterValue"
+                  :show-characteristics="showCharacteristics"
+                  :characteristics="characteristics"
+                  :character-key="characterKey"
+                  :character-value="characterValue"
+                  @toggle-characteristics="toogleCharacteristics"
+                  @add-caracteristic="addCaracteristic"
+                  @remove-characteristic="removeCharacteristic"
                 />
               </div>
-            </div>
-          </div>
-          <div class="border-l border-l-gray-200 p-2.5 md:col-span-3">
-            <BaseSelect
-              :items="attributesList"
-              :label="'attributes'"
-              :selected-item="selectedAttribute"
-              @select-item="selectAttribute"
-              class="mb-5"
-            />
-            <hr class="my-2.5" />
+              <div v-if="isMultiVariant" class="border-l border-l-gray-200 p-2.5 md:col-span-3">
+                <BaseSelect
+                  :items="attributesList"
+                  :label="'attributes'"
+                  :selected-item="selectedAttribute"
+                  @select-item="selectAttribute"
+                  class="mb-5"
+                />
+                <hr class="my-2.5" />
 
-            <ColorSelect
-              v-if="selectedAttribute === 'Color'"
-              :selected-color="selectedColor"
-              @select-color="selectColor"
-              @add-attribute-option="addAttributeOption"
-            />
-            <div class="flex flex-col" v-if="selectedAttribute && selectedAttribute !== 'Color'">
-              <label for="material" class="enter-color">Enter {{ selectedAttribute }}</label>
-              <div class="grid grid-cols-3 gap-2.5">
-                <div class="">
-                  <input
-                    v-model="selectedOption.label"
-                    :placeholder="`${selectedAttribute} label`"
-                    class="w-full py-2.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal rounded-xl px-2.5 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
-                    type="text"
-                  />
+                <ColorSelect
+                  v-if="selectedAttribute === 'Color'"
+                  :selected-color="selectedColor"
+                  @select-color="selectColor"
+                  @add-attribute-option="addAttributeOption"
+                />
+                <div
+                  class="flex flex-col"
+                  v-if="selectedAttribute && selectedAttribute !== 'Color'"
+                >
+                  <label for="material" class="enter-color">Enter {{ selectedAttribute }}</label>
+                  <div class="grid grid-cols-3 gap-2.5">
+                    <div class="">
+                      <input
+                        v-model="selectedOption.label"
+                        :placeholder="`${selectedAttribute} label`"
+                        class="w-full py-2.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal rounded-xl px-2.5 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
+                        type="text"
+                      />
+                    </div>
+                    <div class="">
+                      <input
+                        v-model="selectedOption.attributeValue"
+                        :placeholder="`${selectedAttribute} value`"
+                        class="w-full py-2.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal rounded-xl px-2.5 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
+                        type="text"
+                      />
+                    </div>
+                    <div class="">
+                      <button
+                        class="bg-blue-600 text-white px-2.5 py-3.5 w-full rounded-xl"
+                        @click="addAttributeOption"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div class="">
-                  <input
-                    v-model="selectedOption.attributeValue"
-                    :placeholder="`${selectedAttribute} value`"
-                    class="w-full py-2.5 placeholder:text-placeholder placeholder:text-base lg:text-lg md:text-base text-sm font-normal rounded-xl px-2.5 border-[#F3F2F4] border-2 focus:outline-none focus:border-[#D7BCF5]"
-                    type="text"
-                  />
-                </div>
-                <div class="">
-                  <button
-                    class="bg-blue-600 text-white px-2.5 py-3.5 w-full rounded-xl"
-                    @click="addAttributeOption"
-                  >
-                    Add
-                  </button>
-                </div>
+                <h2>Attributes and Options</h2>
+                <ul>
+                  <li v-for="(options, attribute) in attributes" :key="attribute">
+                    <strong>{{ attribute }}:</strong> {{ options }}
+                  </li>
+                </ul>
               </div>
             </div>
-            <h2>Attributes and Options</h2>
-            <ul>
-              <li v-for="(options, attribute) in attributes" :key="attribute">
-                <strong>{{ attribute }}:</strong> {{ options }}
-              </li>
-            </ul>
           </div>
-          <div
-            class="border-l border-l-gray-200 p-2.5 md:col-span-3 h-screen overflow-y-auto pb-10"
-          >
-            <CharacteristicList
-              v-model:characterKey="characterKey"
-              v-model:characterValue="characterValue"
-              :show-characteristics="showCharacteristics"
-              :characteristics="characteristics"
-              :character-key="characterKey"
-              :character-value="characterValue"
-              @toggle-characteristics="toogleCharacteristics"
-              @add-caracteristic="addCaracteristic"
-              @remove-characteristic="removeCharacteristic"
-            />
-          </div>
-        </div></div
-    ></Transition>
+        </div>
+      </div></Transition
+    >
   </div>
 </template>
 
@@ -475,11 +512,7 @@ const selectedSubCategory = ref(null)
 const selectedSubSubCategory = ref(null)
 const selectedBrand = ref(null)
 const selectedColor = ref('#ffffff')
-const selectedMaterial = ref(null)
-const currentStock = ref(0)
-const currentPrice = ref(0)
 const madeIn = ref(null)
-const productSizes = ref([])
 const characteristics = ref([])
 const showCharacteristics = ref(false)
 const attributes = ref([])
@@ -487,6 +520,11 @@ const selectedAttribute = ref(null)
 const attributesList = ref(['Color', 'Material', 'Size'])
 const characterKey = ref('')
 const characterValue = ref('')
+const isMultiVariant = ref(false)
+
+const toggleMultiVariant = () => {
+  isMultiVariant.value = !isMultiVariant.value
+}
 
 // Unified structure for a new option based on attribute type
 const selectedOption = reactive({
@@ -737,7 +775,8 @@ const createProduct = async () => {
       attributes: attributes.value,
       characteristics: characteristics.value,
       defaultPrice: Number(defaultPrice.value),
-      defaultStock: Number(defaultStock.value)
+      defaultStock: Number(defaultStock.value),
+      isMultiVariant: isMultiVariant.value
     })
 
     if (response && response.status === 201) {
