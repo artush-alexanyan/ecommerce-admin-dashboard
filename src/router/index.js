@@ -24,9 +24,19 @@ const router = createRouter({
           component: () => import('../management/products/ProductsRoot.vue')
         },
         {
+          path: '/products/add-product',
+          name: 'NewProduct',
+          component: () => import('../management/products/add-product/NewProduct.vue')
+        },
+        {
           path: 'variants/:id',
           name: 'ProductVariants',
           component: () => import('../management/products/variants/ProductVariants.vue')
+        },
+        {
+          path: '/orders',
+          name: 'OrdersRoot',
+          component: () => import('../management/orders/OrdersRoot.vue')
         },
         {
           path: 'categories',

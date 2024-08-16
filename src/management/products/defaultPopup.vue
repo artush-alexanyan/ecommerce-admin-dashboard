@@ -6,7 +6,7 @@
     >
       <div
         v-if="showImagesPopup"
-        class="fixed top-0 left-0 z-30 bg-black/50 w-full h-screen flex p-5 justify-center"
+        class="fixed top-0 left-0 z-30 bg-black/50 w-full h-screen flex p-5 items-center justify-center"
       >
         <div class="bg-white p-5 rounded-[30px]">
           <div>

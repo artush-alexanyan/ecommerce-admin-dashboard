@@ -5,6 +5,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import './assets/tailwind.css'
+import { MotionPlugin } from '@vueuse/motion'
 import Unicon from 'vue-unicons'
 import customUserIcon from './assets/icons/custom-user'
 import customGoogleIcon from './assets/icons/custom-google'
@@ -51,6 +52,9 @@ import {
   uniChart,
   uniApps,
   uniArrowLeft,
+  uniArrowRight,
+  uniAngleRightB,
+  uniAngleDown,
   uniCheckCircle,
   uniInfoCircle,
   uniExclamationOctagon,
@@ -102,6 +106,9 @@ Unicon.add([
   uniChart,
   uniApps,
   uniArrowLeft,
+  uniArrowRight,
+  uniAngleRightB,
+  uniAngleDown,
   uniCheckCircle,
   uniInfoCircle,
   uniExclamationOctagon,
@@ -121,6 +128,7 @@ Unicon.add([
 
 const app = createApp(App)
 
+app.use(MotionPlugin)
 app.use(createPinia())
 app.use(Unicon)
 app.use(router)

@@ -8,35 +8,25 @@
         :show-new-product-popup="showNewProductPopup"
         @close-new-product-popup="closeNewProductPopup"
       />
-      <ImagesPopup
-        :show-images-popup="showImagesPopup"
-        :product-id="markedProductId"
-        :variants="variants"
-        @close-images-popup="closeImagesPopup"
-      />
       <BaseDeleteModal
         :showDelete="showDelete"
         :deleting="deleting"
         @cancel-delete="cancelDelete"
         @confirm-delete="confirmDelete"
       />
-      <div class="grid xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-2.5">
+      <div class="grid xl:grid-cols-4 lg:grid-cols-2 grid-cols-1 gap-2.5">
         <div
           @mouseover="product.showDetails = true"
           @mouseleave="product.showDetails = false"
           v-for="product in products"
           :key="product._id"
-          class="relative rounded-xl border border-gray-300 hover:shadow-lg transition-all duration-500 hover:border-none bg-white px-5 py-10 flex items-center justify-center hover:cursor-pointer"
+          class="relative rounded-xl border border-gray-300 hover:shadow-lg transition-all duration-500 hover:border-none flex items-center justify-center hover:cursor-pointer"
         >
-          <div class="flex items-center space-x-2.5">
-            <div class="border border-gray-200">
-              <img
-                :src="product.defaultImage"
-                class="h-32 min-w-32 object-contain"
-                alt="productImage"
-              />
-            </div>
-          </div>
+          <img
+            :src="product.defaultImage"
+            class="h-56 w-full object-cover rounded-xl"
+            alt="productImage"
+          />
           <div
             v-if="product.showDetails"
             class="absolute left-0 top-0 p-2.5 w-full h-full bg-black/25 rounded-xl"
@@ -52,12 +42,12 @@
               </div>
               <div class="flex flex-col space-y-2.5">
                 <button
-                  :disabled="variantsLoading"
+                  :disabled="productLoading"
                   @click="openImagesPopup(product._id)"
                   type="button"
                   class="bg-blue-600 text-white px-5 py-2.5 rounded"
                 >
-                  {{ !variantsLoading ? 'Add images' : 'Loading...' }}
+                  {{ !productLoading ? 'Add images' : 'Loading...' }}
                 </button>
                 <button
                   @click="seeVariants(product._id)"
@@ -79,6 +69,21 @@
         </button>
       </div>
     </div>
+    <ImagesPopup
+      :show-images-popup="showImagesPopup"
+      :saving="saving"
+      :uploading="uploading"
+      :btn-text="'product'"
+      :image="image"
+      :existing-images="existingImages"
+      :images="images"
+      :available-for-selection="false"
+      @remove-image="removeImage"
+      @upload-image="uploadImage"
+      @save-images="addImages"
+      @close-images-popup="closeImagesPopup"
+      @handle-image-select="handleImageSelect"
+    />
   </div>
 </template>
 
@@ -91,38 +96,78 @@ import IconTrash from '@/icons/IconTrash.vue'
 import IconView from '@/icons/IconView.vue'
 import BASE_URL from '@/backand/api'
 import NewProductPopupVue from './NewProductPopup.vue.vue'
-import ImagesPopup from './ImagesPopup.vue'
+import ImagesPopup from '../ImagesPopup.vue'
 import { useRouter } from 'vue-router'
+import { useUploadImageStore } from '@/stores/upload-image/upload-image'
 
+const uploadImageStore = useUploadImageStore()
 const router = useRouter()
-const showEditModal = ref(false)
 const showDelete = ref(false)
 const deleting = ref(false)
 const markedTodeleteId = ref(null)
 const productsFetchStore = useProductsFetchStore()
 const products = computed(() => productsFetchStore.products)
 const productsLoading = computed(() => productsFetchStore.productsLoading)
-const editedProduct = ref(null)
 const showNewProductPopup = ref(false)
 const showImagesPopup = ref(false)
 const markedProductId = ref(null)
 const variantsLoading = ref(false)
 const variants = ref([])
+const uploading = computed(() => uploadImageStore.uploading)
+const images = ref([])
+const image = ref(null)
+const existingImages = ref([])
+const saving = ref(false)
+const productLoading = ref(false)
+
 const closeImagesPopup = () => {
   showImagesPopup.value = false
 }
 const openImagesPopup = async (productId) => {
-  console.log('ProductId', productId)
-  variantsLoading.value = true
+  markedProductId.value = productId
+  productLoading.value = true
   try {
-    const response = await BASE_URL.get(`/products/${productId}/variants`)
-    console.log('variants', response.data.variants)
-    variants.value = response.data.variants
-    markedProductId.value = productId
-    variantsLoading.value = false
+    const response = await BASE_URL.get(`/products/getByid/${productId}`)
+    console.log('product', response.data.product)
+    const images = response.data.product.images.map((item) => ({
+      url: item.url,
+      isSelected: false
+    }))
+    existingImages.value = images
+    productLoading.value = false
     showImagesPopup.value = true
   } catch (error) {
-    variantsLoading.value = false
+    productLoading.value = false
+    alert(error.response ? error.respose.data.message : error.message)
+  }
+}
+
+const uploadImage = async () => {
+  const folderName = 'productImages'
+  const imageUrl = await uploadImageStore.uploadImage(image.value, folderName)
+  images.value.push(imageUrl)
+}
+
+const handleImageSelect = (imageFile) => {
+  console.log('imageFile', imageFile)
+  image.value = imageFile
+}
+const removeImage = (index) => {
+  if (index >= 0 && index < images.value.length) {
+    images.value.splice(index, 1)
+  }
+}
+const addImages = async () => {
+  saving.value = true
+  const urls = images.value
+  const productId = markedProductId.value
+  try {
+    const response = await BASE_URL.post(`/products/${productId}/images/add`, { urls })
+    console.log(response.data.message)
+    saving.value = false
+    showImagesPopup.value = false
+  } catch (error) {
+    saving.value = false
     alert(error.response ? error.respose.data.message : error.message)
   }
 }

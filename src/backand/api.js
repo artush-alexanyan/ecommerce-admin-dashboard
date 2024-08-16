@@ -1,15 +1,17 @@
 import axios from 'axios'
-import { useCookies } from 'vue3-cookies'
 
-const { cookies } = useCookies()
-const jwt_token = cookies.get('jwt_token')
-const API_URL = import.meta.env.VITE_API_BASE_URL
+// Retrieve environment variables
+const API_URL_DEV = import.meta.env.VITE_API_BASE_URL
+const API_URL_PROD = import.meta.env.VITE_API_BASE_URL_PROD
 
-const BASE_URL = axios.create({
-  baseURL: API_URL,
-  headers: {
-    Authorization: `Bearer ${jwt_token}`
-  }
+// Determine the base URL based on the environment
+const isProduction = import.meta.env.MODE === 'production'
+const BASE_URL = isProduction ? API_URL_PROD : API_URL_DEV
+
+// Create the Axios instance
+const axiosInstance = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true
 })
 
-export default BASE_URL
+export default axiosInstance

@@ -8,35 +8,80 @@
         <div class="sidebar-content">
           <ul>
             <li
-              @click="changeTab(tab)"
-              class="py-5 px-3.5 cursor-pointer"
-              :class="{
-                'bg-primary text-white': generalCurrentTab === tab
-              }"
+              class="py-3 flex flex-col cursor-pointer text-lg"
               v-for="(list, tab) in generalList"
               :key="list.id"
             >
-              <router-link :to="list.path" class="font-semibold flex items-center space-x-2">
-                <unicon
-                  :name="list.icon"
-                  height="20"
-                  :fill="generalCurrentTab === tab ? 'white' : ''"
-                ></unicon>
-                <span> {{ list.title }}</span>
-              </router-link>
+              <div class="flex items-center justify-between w-full">
+                <button
+                  @click="changeTab(list, tab)"
+                  class="font-semibold flex items-center space-x-2"
+                >
+                  <unicon
+                    :name="list.icon"
+                    height="20"
+                    :fill="generalCurrentTab === tab ? '#883ae1' : 'black'"
+                  ></unicon>
+                  <span
+                    :class="{
+                      'text-primary': generalCurrentTab === tab
+                    }"
+                  >
+                    {{ list.title }}</span
+                  >
+                </button>
+                <button
+                  @click="toggleListChildren(list)"
+                  v-if="list.children && list.children.length > 0"
+                  class="font-semibold flex items-center space-x-2"
+                >
+                  <unicon
+                    v-if="list.showChildren"
+                    name="angle-down"
+                    height="20"
+                    :fill="generalCurrentTab === tab ? '#883ae1' : 'black'"
+                  ></unicon>
+                  <unicon
+                    v-else
+                    name="angle-right-b"
+                    height="20"
+                    :fill="generalCurrentTab === tab ? '#883ae1' : 'black'"
+                  ></unicon>
+                </button>
+              </div>
+
+              <ul v-if="list.showChildren" class="ml-10 mt-3">
+                <li
+                  v-motion-slide-left
+                  class="py-1 cursor-pointer"
+                  v-for="(subList, index) in list.children"
+                  :key="index"
+                >
+                  <button
+                    type="button"
+                    @click="changeSubList(subList)"
+                    :class="currentSubListTitle === subList.title ? 'text-primary' : ''"
+                  >
+                    {{ subList.title }}
+                  </button>
+                </li>
+              </ul>
             </li>
           </ul>
         </div>
-        <div class="absolute bottom-10 left-7 right-7 w-3/4 pb-7 border border-gray-300">
+        <div class="absolute bottom-10 left-7 right-7 w-3/4 pb-7 rounded-xl border border-gray-300">
           <div class="p-2 flex">
             <button class="ml-auto">
               <unicon name="ellipsis-h" height="16"></unicon>
             </button>
           </div>
-          <div class="px-5">
+          <div v-if="authCheckLoading" class="flex items-center justify-center h-28">
+            <BaseLoader />
+          </div>
+          <div class="px-5" v-else>
             <div class="user flex flex-col items-center justify-center" v-if="props.user">
               <div
-                class="h-12 w-12 flex items-center justify-center text-white uppercase bg-[#0B877F]"
+                class="h-12 w-12 rounded-full flex items-center justify-center text-white uppercase bg-[#883ae1]"
               >
                 {{ user.username.substring(0, 1) }}
               </div>
@@ -69,27 +114,87 @@
 import { ref } from 'vue'
 import BASE_URL from '@/backand/api'
 import { useRouter } from 'vue-router'
+import BaseLoader from '@/base/BaseLoader.vue'
 
 const props = defineProps({
-  user: Object
+  user: Object,
+  authCheckLoading: Boolean
 })
 const signingOut = ref(false)
 const router = useRouter()
 
 const generalList = ref([
   { id: 0, icon: 'apps', path: '/', title: 'Dashboard' },
-  { id: 1, icon: 'layer-group', path: '/products', title: 'Products' },
-  // { id: 2, icon: 'shopping-cart', path: '/', title: 'Orders' },
-  // { id: 3, icon: 'user', path: '/', title: 'Customers' },
-  // { id: 4, icon: 'setting', path: '/', title: 'Settings' },
-  { id: 5, icon: 'list-ul', path: '/categories', title: 'Categories' },
-  { id: 5, icon: 'wordpress', path: '/brands', title: 'Brands' }
+  {
+    id: 1,
+    icon: 'layer-group',
+    path: '/products',
+    title: 'Products',
+    showChildren: false,
+    children: [
+      {
+        id: 0,
+        icon: 'layer-group',
+        path: '/products',
+        title: 'Product list',
+        showChildren: false,
+        children: []
+      },
+      {
+        id: 1,
+        icon: 'layer-group',
+        path: '/products/add-product',
+        title: 'Add product',
+        showChildren: false,
+        children: []
+      }
+    ]
+  },
+  {
+    id: 1,
+    icon: 'shopping-bag',
+    path: '/orders',
+    title: 'Orders',
+    showChildren: false,
+    children: [
+      {
+        id: 0,
+        icon: 'layer-group',
+        path: '/orders',
+        title: 'Order list',
+        showChildren: false,
+        children: []
+      },
+      {
+        id: 1,
+        icon: 'layer-group',
+        path: '/products/add-product',
+        title: 'Add product',
+        showChildren: false,
+        children: []
+      }
+    ]
+  },
+  { id: 5, icon: 'list-ul', path: '/categories', title: 'Categories', showChildren: false },
+  { id: 5, icon: 'wordpress', path: '/brands', title: 'Brands', showChildren: false }
 ])
 
 const generalCurrentTab = ref(0)
+const currentSubListTitle = ref('')
 
-const changeTab = (tab) => {
+const changeTab = (list, tab) => {
+  currentSubListTitle.value = list.children ? list.children[0].title : ''
   generalCurrentTab.value = tab
+  router.push({ path: list.path })
+}
+
+const changeSubList = (subList) => {
+  currentSubListTitle.value = subList.title
+  router.push({ path: subList.path })
+}
+
+const toggleListChildren = (list) => {
+  list.showChildren = !list.showChildren
 }
 
 const userSignout = () => {

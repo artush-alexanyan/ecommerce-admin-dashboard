@@ -13,6 +13,7 @@
     "@tensorflow/tfjs": "^4.20.0",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/eslint-config-prettier": "^9.0.0",
+    "@vueuse/motion": "^2.2.3",
     "animate.css": "^4.1.1",
     "autoprefixer": "^10",
     "axios": "^1.6.8",
@@ -24,6 +25,7 @@
     "tailwindcss": "^3",
     "vite": "^5.2.11",
     "vue": "^3.4.21",
+    "vue-resizable": "^2.1.7",
     "vue-router": "^4.3.0",
     "vue-unicons": "^3.3.1",
     "vue3-cookies": "^1.0.6"

@@ -12,7 +12,7 @@
   border-radius: 50%;
   border: 5px solid;
   border-color: #dbdcef;
-  border-right-color: #0b877f;
+  border-right-color: #883ae1;
   animation: spinner-d3wgkg 1s infinite linear;
 }
 

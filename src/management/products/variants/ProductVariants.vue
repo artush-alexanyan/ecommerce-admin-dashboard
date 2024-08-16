@@ -17,44 +17,17 @@
             <div class="product" v-if="product">
               <div class="bg-white p-5 rounded-[30px] grid md:grid-cols-3 gap-5">
                 <div class="w-full md:col-span-2">
-                  <h4 class="text-xl font-semibold">Variations</h4>
-                  <div class="ul">
-                    <div
-                      class="li py-2"
-                      v-for="(variant, index) in product.variants"
-                      :key="variant.sku"
-                    >
-                      <span class="text-xs text-purple-600"
-                        >{{ index + 1 }} - {{ variant.sku }}</span
-                      >
-                      <ul>
-                        <li v-for="(attribute, index) in variant.attributes" :key="index">
-                          <div class="flex items-center">
-                            <span class="font-semibold">{{ attribute.name }}:</span>
-                            <ul>
-                              <li v-for="(option, index) in attribute.options" :key="index">
-                                <span>{{ option.label }}</span>
-                              </li>
-                            </ul>
-                          </div>
-                        </li>
-                      </ul>
-                      <span class="font-semibold">Images: {{ variant.images.length }}</span> <br />
-                      <span class="font-semibold">Stock: {{ variant.stock }}</span
-                      ><br />
-                      <span class="font-semibold">Price: {{ variant.price }}</span
-                      ><br />
-                      <button @click="openImagesPopup(variant._id)" class="text-green-600">
-                        Add image
-                      </button>
-                    </div>
-                  </div>
+                  <VariantList
+                    :variants="product.variants"
+                    @open-images-popup="openImagesPopup"
+                    @open-variant-edit-modal="openVariantEditModal"
+                  />
                 </div>
                 <div class="md:col-span-1 border-l border-l-gray-200 px-5">
                   <h4 class="text-xl font-semibold">Attributes</h4>
-                  <BaseSelect :label="'color'" v-if="colors.length > 0" :items="colors" />
+                  <!-- <BaseSelect :label="'color'" v-if="colors.length > 0" :items="colors" />
                   <BaseSelect :label="'material'" v-if="materials.length > 0" :items="materials" />
-                  <BaseSelect :label="'size'" v-if="sizes.length > 0" :items="sizes" />
+                  <BaseSelect :label="'size'" v-if="sizes.length > 0" :items="sizes" /> -->
                 </div>
               </div>
             </div>
@@ -80,6 +53,22 @@
       @save-images="addImages"
       @close-images-popup="closeImagesPopup"
     />
+    <VariantEditModal
+      v-if="editedVariant"
+      v-model:newCharTitle="newCharTitle"
+      v-model:newCharDescription="newCharDescription"
+      v-model:stock.number="editedVariant.stock"
+      v-model:price.number="editedVariant.price"
+      :variant="editedVariant"
+      :editing="editing"
+      :show-variant-edit-popup="showVariantEditPopup"
+      :show-new-char-form="showNewCharForm"
+      @close-variant-edit-popup="closeVariantEditModal"
+      @edit-variant-base-info="editVariantBaseInfo"
+      @add-new-character="addNewCharacter"
+      @remove-character="removeCharacter"
+      @toggle-characters="toggleCharacters"
+    />
   </div>
 </template>
 
@@ -91,6 +80,8 @@ import { useRouter, useRoute } from 'vue-router'
 import BaseLoader from '@/base/BaseLoader.vue'
 import BaseSelect from '../add-product/BaseSelect.vue'
 import ImagesPopup from '../ImagesPopup.vue'
+import VariantEditModal from './VariantEditModal.vue'
+import VariantList from './VariantList.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -107,8 +98,24 @@ const selectedMaterial = ref(null)
 const selectedColor = ref(null)
 const selectedSize = ref(null)
 const selectedVariantId = ref(null)
-const currentPrice = ref(0)
-const currentStock = ref(0)
+const showVariantEditPopup = ref(false)
+const editedVariant = ref(null)
+const editing = ref(false)
+const markedEditVariantId = ref(null)
+const newCharTitle = ref('')
+const newCharDescription = ref('')
+const showNewCharForm = ref(false)
+
+const openVariantEditModal = (variant) => {
+  markedEditVariantId.value = variant._id
+  console.log('variantId', markedEditVariantId.value)
+  editedVariant.value = variant
+  showVariantEditPopup.value = true
+}
+
+const closeVariantEditModal = () => {
+  showVariantEditPopup.value = false
+}
 
 const openImagesPopup = (variantId) => {
   selectedVariantId.value = variantId
@@ -122,48 +129,6 @@ const closeImagesPopup = () => {
 const backToProducts = () => {
   router.push({ path: '/products' })
 }
-
-// Computed property to get unique colors
-const colors = computed(() => {
-  const colorSet = new Set()
-  product.value.variants.forEach((variant) => {
-    const colorAttr = variant.attributes.find((attr) => attr.name.toLowerCase() === 'color')
-    if (colorAttr) {
-      colorAttr.options.forEach((option) => {
-        colorSet.add(JSON.stringify(option))
-      })
-    }
-  })
-  return Array.from(colorSet).map((color) => JSON.parse(color))
-})
-
-// Computed property to get unique sizes
-const sizes = computed(() => {
-  const sizeSet = new Set()
-  product.value.variants.forEach((variant) => {
-    const sizeAttr = variant.attributes.find((attr) => attr.name.toLowerCase() === 'size')
-    if (sizeAttr) {
-      sizeAttr.options.forEach((option) => {
-        sizeSet.add(JSON.stringify(option))
-      })
-    }
-  })
-  return Array.from(sizeSet).map((size) => JSON.parse(size))
-})
-
-// Computed property to get unique materials
-const materials = computed(() => {
-  const materialSet = new Set()
-  product.value.variants.forEach((variant) => {
-    const materialAttr = variant.attributes.find((attr) => attr.name.toLowerCase() === 'material')
-    if (materialAttr) {
-      materialAttr.options.forEach((option) => {
-        materialSet.add(JSON.stringify(option))
-      })
-    }
-  })
-  return Array.from(materialSet).map((material) => JSON.parse(material))
-})
 
 const selectMaterial = (item) => {
   selectedMaterial.value = item
@@ -181,6 +146,50 @@ const selectSize = (item) => {
   console.log(item)
   selectedSize.value = item
   sizes.value.push({ size: item })
+}
+
+const toggleCharacters = () => {
+  showNewCharForm.value = !showNewCharForm.value
+}
+
+const addNewCharacter = () => {
+  if (editedVariant.value) {
+    if (newCharTitle.value.trim() !== '' && newCharDescription.value.trim() !== '') {
+      editedVariant.value.characteristics.push({
+        title: newCharTitle.value,
+        description: newCharDescription.value
+      })
+    }
+  } else {
+    return
+  }
+}
+
+const removeCharacter = (index) => {
+  if (editedVariant.value) {
+    if (index >= 0 && index < editedVariant.value.characteristics.length) {
+      editedVariant.value.characteristics.splice(index, 1)
+    }
+  }
+}
+
+const editVariantBaseInfo = async () => {
+  const variantId = markedEditVariantId.value
+  const productId = route.params.id
+  editing.value = true
+  try {
+    const response = await BASE_URL.put(`/products/${productId}/variants/${variantId}/editBase`, {
+      price: editedVariant.value.price,
+      stock: editedVariant.value.stock,
+      characteristics: editedVariant.value.characteristics
+    })
+    console.log('Edited', response.data.message)
+    showVariantEditPopup.value = false
+    editing.value = false
+  } catch (error) {
+    editing.value = false
+    alert(error.response ? error.response.data.message : error.message)
+  }
 }
 
 const handleImageSelect = (imageFile) => {

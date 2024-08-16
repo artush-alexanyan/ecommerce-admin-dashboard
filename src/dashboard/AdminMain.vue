@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="main">
-      <SidebarRoot :user="user" />
+      <SidebarRoot :user="user" :auth-check-loading="authCheckLoading" />
       <div class="content ml-auto bg-gray-50" :style="contentSize">
         <HeaderRoot :user="user" :contentSize="contentSize" />
         <div class="main-content h-screen overflow-x-hidden overflow-y-auto px-10 pt-24 pb-10">
@@ -20,6 +20,7 @@ import HeaderRoot from './header/HeaderRoot.vue'
 
 const checkAuthState = useCheckAuthStore()
 const user = computed(() => checkAuthState.user)
+const authCheckLoading = computed(() => checkAuthState.authCheckLoading)
 const contentSize = ref('')
 
 const logScreenWidth = () => {

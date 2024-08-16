@@ -80,6 +80,7 @@
                     <div class="relative w-24">
                       <img :src="imageItem.url" alt="" class="h-32 w-24 object-cover" />
                       <button
+                        v-if="availableForSelection"
                         @click="emit('select-image', imageItem)"
                         class="absolute bottom-1 left-1 flex items-center justify-center h-4 w-4 rounded-full border border-blue-600"
                       >
@@ -117,7 +118,8 @@ const props = defineProps({
   btnText: String,
   images: Array,
   existingImages: Array,
-  image: Object
+  image: Object,
+  availableForSelection: { type: Boolean, default: true }
 })
 
 const imageRef = ref(null)

@@ -4,7 +4,7 @@
     <div class="flex items-center justify-center h-screen">
       <div class="login-form p-5">
         <h1 class="text-center mb-5 text-2xl">Login</h1>
-        <form @submit.prevent="loginWithEmailAndPassword">
+        <form @submit.prevent="userSigninWithEmailPassword">
           <div class="flex flex-col my-5">
             <label class="text-sm mb-1.5 font-semibold" for="email">Email</label>
             <div class="relative">
@@ -77,33 +77,22 @@ const resetMessage = () => {
     messages.value = []
   }, 2000)
 }
-const loginWithEmailAndPassword = async () => {
-  loginLoading.value = true
+
+const userSigninWithEmailPassword = async () => {
   const options = {
     email: email.value,
     password: password.value
   }
   try {
+    loginLoading.value = true
     const response = await BASE_URL.post('/auth/login', options)
-    const token = response.data.token
-    cookies.set('jwt_token', token)
+    const data = response.data
+    console.log('register response', data)
     loginLoading.value = false
-    messages.value.push({
-      type: 'Success',
-      message: 'Login successful. Redirecting to dashboard...'
-    })
-    setTimeout(() => {
-      router.push({ path: '/' })
-    }, 2500)
+    window.location.href = 'http://localhost:5173'
   } catch (error) {
     loginLoading.value = false
-    console.error(error)
-    const authError = error.response ? error.response.data.message : error.message
-    messages.value.push({
-      type: 'Error',
-      message: authError
-    })
-    resetMessage()
+    console.log('error', error.response ? error.response.data.message : error.message)
   }
 }
 </script>
