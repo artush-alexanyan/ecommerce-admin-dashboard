@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useCheckAuthStore } from '@/stores/checauthstate'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,6 +13,7 @@ const router = createRouter({
       path: '/',
       name: 'AdminMain',
       component: () => import('../dashboard/AdminMain.vue'),
+      meta: { requiresAuth: true },
       children: [
         {
           path: '',
@@ -52,5 +54,20 @@ const router = createRouter({
     }
   ]
 })
+router.beforeEach(async (to, from, next) => {
+  try {
+    const authStore = useCheckAuthStore()
+    await authStore.checkAuthState()
+    const user = authStore.user
 
+    if (to.matched.some((record) => record.meta.requiresAuth) && !user) {
+      next({ name: 'AdminAuth' })
+    } else {
+      next()
+    }
+  } catch (error) {
+    console.error('Failed to check auth state:', error)
+    next({ name: 'AdminAuth' })
+  }
+})
 export default router

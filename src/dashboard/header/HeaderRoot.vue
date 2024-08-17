@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="header fixed top-0 right-0 h-20 bg-gray-50 border-b flex items-center justify-between px-10"
+      class="header fixed top-0 right-0 z-50 h-20 bg-gray-50 border-b flex items-center justify-between px-10"
       :style="props.contentSize"
     >
       <div class="user-welcome">

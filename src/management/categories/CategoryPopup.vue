@@ -89,7 +89,7 @@ const uploadImageStore = useUploadImageStore()
 const saveCategory = async () => {
   const folderName = 'categoryIcons'
   const image = imageFile.value
-  const icon = await uploadImageStore.uploadImage(image, folderName)
+  const icon = await uploadImageStore.novoMercatoUpload(image, folderName)
   emit('save-category', icon)
 }
 

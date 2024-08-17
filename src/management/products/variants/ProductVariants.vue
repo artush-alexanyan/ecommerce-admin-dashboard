@@ -198,7 +198,7 @@ const handleImageSelect = (imageFile) => {
 
 const uploadImage = async () => {
   const folderName = 'productImages'
-  const imageUrl = await uploadImageStore.uploadImage(image.value, folderName)
+  const imageUrl = await uploadImageStore.novoMercatoUpload(image.value, folderName)
   images.value.push(imageUrl)
 }
 

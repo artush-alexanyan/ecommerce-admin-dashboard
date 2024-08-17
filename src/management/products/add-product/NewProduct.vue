@@ -709,7 +709,7 @@ const uploadNewImage = async () => {
     return
   }
   const folderName = 'products'
-  const imageUrl = await uploadImageStore.uploadImage(image.value, folderName)
+  const imageUrl = await uploadImageStore.novoMercatoUpload(image.value, folderName)
   defaultImageUrl.value = imageUrl
 }
 const createProduct = async () => {
