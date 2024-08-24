@@ -80,7 +80,14 @@
           </div>
           <div class="px-5" v-else>
             <div class="user flex flex-col items-center justify-center" v-if="props.user">
+              <img
+                v-if="user.avatar"
+                :src="user.avatar"
+                alt="avatar"
+                class="h-12 w-12 rounded-full object-cover"
+              />
               <div
+                v-else
                 class="h-12 w-12 rounded-full flex items-center justify-center text-white uppercase bg-[#883ae1]"
               >
                 {{ user.username.substring(0, 1) }}
@@ -151,7 +158,7 @@ const generalList = ref([
     ]
   },
   {
-    id: 1,
+    id: 2,
     icon: 'shopping-bag',
     path: '/orders',
     title: 'Orders',
@@ -175,8 +182,33 @@ const generalList = ref([
       }
     ]
   },
-  { id: 5, icon: 'list-ul', path: '/categories', title: 'Categories', showChildren: false },
-  { id: 5, icon: 'wordpress', path: '/brands', title: 'Brands', showChildren: false }
+  { id: 3, icon: 'list-ul', path: '/categories', title: 'Categories', showChildren: false },
+  { id: 4, icon: 'wordpress', path: '/brands', title: 'Brands', showChildren: false },
+  {
+    id: 5,
+    icon: 'web-grid',
+    path: '/carousel',
+    title: 'Application',
+    showChildren: false,
+    children: [
+      {
+        id: 0,
+        icon: 'layer-group',
+        path: '/carousel',
+        title: 'Carousel',
+        showChildren: false,
+        children: []
+      },
+      {
+        id: 1,
+        icon: 'layer-group',
+        path: '/carousel',
+        title: 'Navigation',
+        showChildren: false,
+        children: []
+      }
+    ]
+  }
 ])
 
 const generalCurrentTab = ref(0)

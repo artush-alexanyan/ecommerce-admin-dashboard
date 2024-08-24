@@ -63,7 +63,9 @@ import {
   uniTimes,
   uniWordpress,
   uniImagePlus,
-  uniCloudUpload
+  uniCloudUpload,
+  uniWebGrid,
+  uniSave
 } from 'vue-unicons/dist/icons'
 
 Unicon.add([
@@ -118,6 +120,8 @@ Unicon.add([
   uniWordpress,
   uniImagePlus,
   uniCloudUpload,
+  uniWebGrid,
+  uniSave,
   customArrowLeft,
   customGoogleIcon,
   customUserIcon,

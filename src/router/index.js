@@ -49,6 +49,11 @@ const router = createRouter({
           path: 'brands',
           name: 'BrandsRoot',
           component: () => import('../management/brands/BrandsRoot.vue')
+        },
+        {
+          path: 'carousel',
+          name: 'Carousel',
+          component: () => import('@/application/CarouselItems.vue')
         }
       ]
     }

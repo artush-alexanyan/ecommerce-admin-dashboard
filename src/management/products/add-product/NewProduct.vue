@@ -482,6 +482,8 @@ const attributesList = ref(['Color', 'Material', 'Size'])
 const characterKey = ref('')
 const characterValue = ref('')
 const isMultiVariant = ref(false)
+const imageHeight = ref(null)
+const imageWidth = ref(null)
 
 const toggleMultiVariant = () => {
   isMultiVariant.value = !isMultiVariant.value
@@ -692,10 +694,21 @@ const resetMessages = () => {
 
 const handleFileSelection = (event) => {
   image.value = event.target.files[0]
-  if (image.value) {
-    const reader = new FileReader()
 
-    reader.readAsDataURL(image.value)
+  if (image.value) {
+    const img = new Image()
+
+    // Load the image to get its dimensions
+    img.onload = function () {
+      imageWidth.value = img.width
+      imageHeight.value = img.height
+      console.log('imageHeight.value', imageHeight.value)
+      console.log('imageWidth.value', imageWidth.value)
+      console.log('Image dimensions:', imageWidth.value, imageHeight.value)
+    }
+
+    // Read the file as a Data URL
+    img.src = URL.createObjectURL(image.value)
   }
 }
 const uploadNewImage = async () => {
@@ -722,6 +735,15 @@ const createProduct = async () => {
     resetMessages()
     return
   }
+  if (!imageHeight.value || !imageWidth.value) {
+    messages.value.push({
+      message: 'Not height and width specified for image',
+      type: 'Warning'
+    })
+    loading.value = false
+    resetMessages()
+    return
+  }
   const classificationResults = []
   // const classificationResults = await processImage(defaultImageUrl.value)
   // console.log('classificationResults', classificationResults)
@@ -741,7 +763,9 @@ const createProduct = async () => {
       characteristics: characteristics.value,
       defaultPrice: Number(defaultPrice.value),
       defaultStock: Number(defaultStock.value),
-      isMultiVariant: isMultiVariant.value
+      isMultiVariant: isMultiVariant.value,
+      imageHeight: imageHeight.value,
+      imageWidth: imageWidth.value
     })
 
     if (response && response.status === 201) {

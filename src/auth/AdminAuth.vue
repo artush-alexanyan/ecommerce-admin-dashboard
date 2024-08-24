@@ -89,7 +89,16 @@ const userSigninWithEmailPassword = async () => {
     const data = response.data
     console.log('register response', data)
     loginLoading.value = false
-    window.location.href = 'http://localhost:5173'
+    const environment = import.meta.env.MODE
+    if (import.meta.env.MODE === 'development') {
+      console.log('Running in development mode')
+    } else if (import.meta.env.MODE === 'production') {
+      console.log('Running in production mode')
+    }
+    const destination =
+      environment === 'production' ? 'https://admin-novomercato.ru' : 'http://localhost:2024'
+
+    window.location.href = destination
   } catch (error) {
     loginLoading.value = false
     console.log('error', error.response ? error.response.data.message : error.message)

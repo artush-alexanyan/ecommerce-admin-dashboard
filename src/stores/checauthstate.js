@@ -1,8 +1,5 @@
 import { defineStore } from 'pinia'
 import BASE_URL from '@/backand/api'
-import { useCookies } from 'vue3-cookies'
-
-const { cookies } = useCookies()
 
 export const useCheckAuthStore = defineStore('CheckAuthStore', {
   state: () => ({

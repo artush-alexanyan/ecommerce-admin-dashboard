@@ -62,7 +62,7 @@
               <div class="ul py-5 grid grid-cols-6 gap-5">
                 <div class="li" v-for="(imageItem, index) in images" :key="index">
                   <div class="relative">
-                    <img :src="imageItem" alt="" class="h-32 w-24 object-cover rounded-xl" />
+                    <img :src="imageItem.url" alt="" class="h-32 w-24 object-cover rounded-xl" />
                     <button @click="emit('remove-image', index)" class="absolute top-0 right-0">
                       <unicon name="times" fill="red"></unicon>
                     </button>

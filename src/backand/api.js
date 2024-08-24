@@ -8,6 +8,8 @@ const API_URL_PROD = import.meta.env.VITE_API_BASE_URL_PROD
 const isProduction = import.meta.env.MODE === 'production'
 const BASE_URL = isProduction ? API_URL_PROD : API_URL_DEV
 
+console.log("BASE_URL", BASE_URL)
+
 // Create the Axios instance
 const axiosInstance = axios.create({
   baseURL: BASE_URL,

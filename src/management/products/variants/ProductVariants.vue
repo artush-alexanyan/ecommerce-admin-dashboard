@@ -105,6 +105,8 @@ const markedEditVariantId = ref(null)
 const newCharTitle = ref('')
 const newCharDescription = ref('')
 const showNewCharForm = ref(false)
+const imageHeight = ref(null)
+const imageWidth = ref(null)
 
 const openVariantEditModal = (variant) => {
   markedEditVariantId.value = variant._id
@@ -194,12 +196,32 @@ const editVariantBaseInfo = async () => {
 
 const handleImageSelect = (imageFile) => {
   image.value = imageFile
+
+  if (image.value) {
+    const img = new Image()
+
+    // Load the image to get its dimensions
+    img.onload = function () {
+      imageWidth.value = img.width
+      imageHeight.value = img.height
+      console.log('imageHeight.value', imageHeight.value)
+      console.log('imageWidth.value', imageWidth.value)
+      console.log('Image dimensions:', imageWidth.value, imageHeight.value)
+    }
+
+    // Read the file as a Data URL
+    img.src = URL.createObjectURL(image.value)
+  }
 }
 
 const uploadImage = async () => {
   const folderName = 'productImages'
   const imageUrl = await uploadImageStore.novoMercatoUpload(image.value, folderName)
-  images.value.push(imageUrl)
+  images.value.push({
+    url: imageUrl,
+    height: imageHeight.value,
+    width: imageWidth.value
+  })
 }
 
 const selectImage = (imageItem) => {
@@ -207,14 +229,22 @@ const selectImage = (imageItem) => {
   imageItem.isSelected = !imageItem.isSelected
 
   if (imageItem.isSelected) {
-    // If the image is selected and not already in the array, add it
-    if (!images.value.includes(imageItem.url)) {
-      images.value.push(imageItem.url)
+    // Check if the imageItem already exists in the images array
+    const exists = images.value.some(
+      (image) =>
+        image.url === imageItem.url &&
+        image.height === imageItem.height &&
+        image.width === imageItem.width
+    )
+
+    if (!exists) {
+      images.value.push(imageItem)
       console.log('Image selected:', imageItem.url)
     }
   } else {
     // If the image is deselected and in the array, remove it
-    const index = images.value.indexOf(imageItem.url)
+    const index = images.value.findIndex((image) => image.url === imageItem.url)
+
     if (index !== -1) {
       images.value.splice(index, 1)
       console.log('Image deselected:', imageItem.url)
@@ -233,7 +263,7 @@ const addImages = async () => {
   saving.value = true
   try {
     const response = await BASE_URL.post(`/variants/${variantId}/images/add`, {
-      urls: images.value
+      images: images.value
     })
     console.log(response.data)
     selectedColor.value = null
@@ -255,6 +285,8 @@ const getProduct = async (productId) => {
     console.log('product', product.value.variants)
     const images = response.data.product.images.map((item) => ({
       url: item.url,
+      height: item.height,
+      width: item.height,
       isSelected: false
     }))
     existingImages.value = images
