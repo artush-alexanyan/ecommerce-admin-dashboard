@@ -59,20 +59,20 @@ const router = createRouter({
     }
   ]
 })
-router.beforeEach(async (to, from, next) => {
-  try {
-    const authStore = useCheckAuthStore()
-    await authStore.checkAuthState()
-    const user = authStore.user
+// router.beforeEach(async (to, from, next) => {
+//   try {
+//     const authStore = useCheckAuthStore()
+//     await authStore.checkAuthState()
+//     const user = authStore.user
 
-    if (to.matched.some((record) => record.meta.requiresAuth) && !user) {
-      next({ name: 'AdminAuth' })
-    } else {
-      next()
-    }
-  } catch (error) {
-    console.error('Failed to check auth state:', error)
-    next({ name: 'AdminAuth' })
-  }
-})
+//     if (to.matched.some((record) => record.meta.requiresAuth) && !user) {
+//       next({ name: 'AdminAuth' })
+//     } else {
+//       next()
+//     }
+//   } catch (error) {
+//     console.error('Failed to check auth state:', error)
+//     next({ name: 'AdminAuth' })
+//   }
+// })
 export default router
